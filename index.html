@@ -1,156 +1,43 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя Инфо-Био</title>
-    <style>
-        /* Подключаем красивый шрифт */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            /* Крутой темный фон с градиентом */
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        /* Эффект матового стекла (Glassmorphism) */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            animation: fadeIn 1s ease-in-out;
-        }
-        /* Плавное появление */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Стили для аватарки */
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover; /* Чтобы фото не сплющивало */
-            border: 4px solid #00d2ff;
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-        .avatar:hover {
-            transform: scale(1.05); /* Легкое увеличение при наведении */
-        }
-        /* Имя с неоновым градиентом */
-        h1 {
-            margin: 0;
-            font-size: 2.2em;
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle {
-            color: #b0c4de;
-            font-size: 1em;
-            margin-top: 5px;
-            margin-bottom: 20px;
-        }
-        .description {
-            color: #e2e8f0;
-            font-size: 0.95em;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-        /* Музыкальный плеер */
-        .music-player {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .music-player p {
-            margin: 0 0 10px 0;
-            font-size: 0.9em;
-            color: #00d2ff;
-            font-weight: 600;
-        }
-        audio {
-            width: 100%;
-            height: 40px;
-            outline: none;
-        }
-        /* Стили кнопок-ссылок */
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .links a {
-            display: block;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .links a:hover {
-            background: #00d2ff;
-            color: #000;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tools Directory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 py-10">
+    <header class="text-center mb-10">
+      <h1 class="text-4xl font-bold tracking-tight mb-2">Каталог AI Инструментов</h1>
+      <p class="text-slate-400">Подборка лучших нейросетей и сервисов</p>
+    </header>
 
-    <div class="glass-card">
-        <!-- АВАТАРКА -->
-        <!-- Браузер будет искать файл avatar.jpg в той же папке -->
-        <img src="avatar.jpg" alt="Мое фото" class="avatar">
-
-        <h1>Твое Имя</h1>
-        <p class="subtitle">🚀 Дизайнер | Разработчик | Творец</p>
-
-        <p class="description">
-            Привет! Я создаю крутые штуки в интернете. Люблю стильный дизайн, кодинг и атмосферную музыку. Добро пожаловать в мой цифровой мир!
-        </p>
-
-        <!-- МУЗЫКА -->
-        <div class="music-player">
-            <p>🎧 Сейчас играет:</p>
-            <audio controls loop>
-                <!-- Браузер будет искать файл music.mp3 в той же папке -->
-                <source src="music.mp3" type="audio/mpeg">
-                Ваш браузер не поддерживает аудио.
-            </audio>
-        </div>
-
-        <!-- ССЫЛКИ -->
-        <div class="links">
-            <a href="https://t.me/твой_тг" target="_blank">Telegram</a>
-            <a href="https://github.com/твой_гитхаб" target="_blank">GitHub</a>
-            <a href="mailto:твой@email.com">Написать мне</a>
-        </div>
+    <!-- Поиск и фильтры -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Поиск по названию или описанию..." 
+        class="w-full sm:w-2/3 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-indigo-500 text-sm"
+      >
+      <select 
+        id="categoryFilter" 
+        class="w-full sm:w-1/3 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 focus:outline-none focus:border-indigo-500 text-sm"
+      >
+        <option value="all">Все категории</option>
+        <option value="text">Текст & Код</option>
+        <option value="image">Изображения & Видео</option>
+        <option value="audio">Аудио & Голос</option>
+        <option value="productivity">Продуктивность</option>
+      </select>
     </div>
 
+    <!-- Контейнер карточек -->
+    <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
