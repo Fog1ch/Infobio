@@ -5,117 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя Инфо-Био</title>
     <style>
+        /* Подключаем красивый шрифт */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
+            /* Крутой темный фон с градиентом */
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
-        .container {
-            max-width: 600px;
-            width: 90%;
-            background: #ffffff;
+        /* Эффект матового стекла (Glassmorphism) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        .bio-header {
+            max-width: 450px;
+            width: 90%;
             text-align: center;
-            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            animation: fadeIn 1s ease-in-out;
         }
+        /* Плавное появление */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Стили для аватарки */
         .avatar {
-            width: 120px;
-            height: 120px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            background-color: #3498db;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            margin: 0 auto 15px auto;
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+            object-fit: cover; /* Чтобы фото не сплющивало */
+            border: 4px solid #00d2ff;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
         }
+        .avatar:hover {
+            transform: scale(1.05); /* Легкое увеличение при наведении */
+        }
+        /* Имя с неоновым градиентом */
         h1 {
-            color: #2c3e50;
-            margin: 0 0 10px 0;
+            margin: 0;
+            font-size: 2.2em;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .subtitle {
-            color: #7f8c8d;
-            font-size: 1.1em;
-            margin-top: 0;
+            color: #b0c4de;
+            font-size: 1em;
+            margin-top: 5px;
+            margin-bottom: 20px;
         }
-        h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 8px;
-            margin-top: 30px;
+        .description {
+            color: #e2e8f0;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
-        .skills {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        /* Музыкальный плеер */
+        .music-player {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .skills li {
-            background: #e8f4f8;
-            color: #2980b9;
-            padding: 8px 15px;
-            border-radius: 20px;
+        .music-player p {
+            margin: 0 0 10px 0;
             font-size: 0.9em;
-            font-weight: bold;
+            color: #00d2ff;
+            font-weight: 600;
         }
-        .contact-links {
+        audio {
+            width: 100%;
+            height: 40px;
+            outline: none;
+        }
+        /* Стили кнопок-ссылок */
+        .links {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
-        .contact-links a {
-            color: #3498db;
+        .links a {
+            display: block;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .contact-links a:hover {
-            color: #2980b9;
-            text-decoration: underline;
+        .links a:hover {
+            background: #00d2ff;
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="bio-header">
-            <!-- Здесь можно заменить смайлик на ссылку на вашу фотографию в теге <img> -->
-            <div class="avatar">👋</div>
-            <h1>[Ваше Имя]</h1>
-            <p class="subtitle">Студент / Начинающий разработчик / Криэйтор</p>
+    <div class="glass-card">
+        <!-- АВАТАРКА -->
+        <!-- Браузер будет искать файл avatar.jpg в той же папке -->
+        <img src="avatar.jpg" alt="Мое фото" class="avatar">
+
+        <h1>Твое Имя</h1>
+        <p class="subtitle">🚀 Дизайнер | Разработчик | Творец</p>
+
+        <p class="description">
+            Привет! Я создаю крутые штуки в интернете. Люблю стильный дизайн, кодинг и атмосферную музыку. Добро пожаловать в мой цифровой мир!
+        </p>
+
+        <!-- МУЗЫКА -->
+        <div class="music-player">
+            <p>🎧 Сейчас играет:</p>
+            <audio controls loop>
+                <!-- Браузер будет искать файл music.mp3 в той же папке -->
+                <source src="music.mp3" type="audio/mpeg">
+                Ваш браузер не поддерживает аудио.
+            </audio>
         </div>
 
-        <h2>Обо мне</h2>
-        <p>Добро пожаловать на мою страницу Infobio! Здесь я рассказываю немного о себе. Я увлекаюсь технологиями, люблю изучать новое и стремлюсь создавать интересные проекты. В свободное время занимаюсь саморазвитием и читаю книги.</p>
-
-        <h2>Мои навыки</h2>
-        <ul class="skills">
-            <li>HTML5</li>
-            <li>CSS3</li>
-            <li>Python</li>
-            <li>Английский (B2)</li>
-            <li>Работа в команде</li>
-        </ul>
-
-        <h2>Связь со мной</h2>
-        <div class="contact-links">
-            <a href="mailto:ваша_почта@gmail.com">📧 ваша_почта@gmail.com</a>
-            <a href="https://t.me/ваш_username" target="_blank">✈️ Telegram (@ваш_username)</a>
-            <a href="https://github.com/ваш_username" target="_blank">🐙 Мой GitHub</a>
+        <!-- ССЫЛКИ -->
+        <div class="links">
+            <a href="https://t.me/твой_тг" target="_blank">Telegram</a>
+            <a href="https://github.com/твой_гитхаб" target="_blank">GitHub</a>
+            <a href="mailto:твой@email.com">Написать мне</a>
         </div>
     </div>
 
