@@ -367,44 +367,52 @@
       body, button, a, .interactive, input, * { cursor: auto !important; }
       #cursor-dot, #cursor-ring { display: none !important; }
 
-      /* Шапка сайта */
-      .header-container { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; padding: 0.85rem 1rem !important; }
-      .header-controls { width: 100%; justify-content: space-between; }
-      
-      /* Перенос Music Controls вниз на мобилках */
-      #music-controls {
-        top: auto !important; bottom: 1rem !important; left: 1rem !important; right: 1rem !important;
-        background: rgba(8, 8, 8, 0.85); backdrop-filter: blur(10px);
-        padding: 0.5rem; border: 1px solid #1a1a1a; border-radius: 8px;
-        justify-content: space-between; z-index: 9999;
+      /* Шапка сайта: выстраиваем в колонку, чтобы ничего не слипалось */
+      .header-container { 
+        flex-direction: column !important; 
+        align-items: center !important; 
+        gap: 1rem !important; 
+        padding: 1rem !important; 
       }
-      #now-playing-box { display: none !important; } /* Скрываем длинное название трека для экономии места */
-      #music-controls .music-btn { flex: 1; text-align: center; }
+      .header-controls { 
+        width: 100%; 
+        justify-content: center !important; 
+        flex-wrap: wrap !important;
+      }
       
-      /* Глаз (Cyber eye) */
-      #cyber-eye { bottom: 4.5rem !important; right: 1rem !important; width: 36px !important; height: 36px !important; }
+      /* === ФИКС ПЛЕЕРА === */
+      /* Переносим панель музыки в самый низ экрана (как в Spotify) */
+      #music-controls {
+        top: auto !important; 
+        bottom: 1.5rem !important; 
+        left: 1rem !important; 
+        right: 1rem !important;
+        background: rgba(8, 8, 8, 0.95); 
+        backdrop-filter: blur(10px);
+        padding: 0.75rem; 
+        border: 1px solid #1a1a1a; 
+        border-radius: 12px;
+        justify-content: center; 
+        z-index: 9999;
+        flex-wrap: wrap;
+      }
+      /* На мобилках скрываем ползунок громкости, чтобы название трека влезало идеально */
+      #music-controls > div:nth-of-type(1) { display: none !important; }
+      /* =================== */
 
-      /* Сброс сетки на 1 колонку */
+      /* Сброс сеток и отступов */
       .mobile-grid-1 { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
-      
-      /* Уменьшение отступов секций */
       .section-padding { padding: 1rem !important; }
       .hero-padding { padding: 3rem 1rem 2rem !important; }
 
-      /* Lock Screen text fix */
       #lock-title { font-size: clamp(2rem, 12vw, 3.5rem) !important; }
       #lock-screen > div { padding: 0 1rem; word-break: break-word; }
 
-      /* Terminal UI Fix */
       .sys-info-row { gap: 0.5rem !important; }
       .sys-info-row > div { min-width: 45% !important; margin-bottom: 0.5rem; }
-      /* Важно для iOS: font-size >= 16px предотвращает автозум в инпуте */
       #terminal-input { font-size: 16px !important; padding: 0.2rem; } 
       
-      /* Presence Card */
       #presence-card-content { flex-direction: column; text-align: center; justify-content: center; }
-      
-      /* Decompiler Modal */
       #decompiler-modal { padding: 1rem !important; }
     }
   </style>
@@ -1997,4 +2005,3 @@ System halting...`;
 
 </body>
 </html>
-
