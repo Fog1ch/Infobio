@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Оптимизированный viewport для предотвращения случайного зума -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Fog1ch. — Portfolio</title>
   <meta name="description" content="Software Engineering & AI enthusiast. Building the future from Poland." />
 
@@ -52,6 +53,7 @@
       cursor: none;
       overflow-x: hidden;
       min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
     }
     body.locked { overflow: hidden; }
 
@@ -103,7 +105,6 @@
       pointer-events: none;
       z-index: 99999998;
       transform: translate3d(-50%, -50%, 0);
-      /* NO transition on position — only on size/color */
       transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background 0.25s ease, backdrop-filter 0.25s ease;
     }
     #cursor-ring.hovered {
@@ -143,6 +144,7 @@
       font-weight: 700;
       letter-spacing: -0.02em;
       color: #fff;
+      text-align: center;
     }
     #lock-prompt {
       font-family: 'JetBrains Mono', monospace;
@@ -151,6 +153,7 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       animation: pulse-text 2s infinite ease-in-out;
+      text-align: center;
     }
     @keyframes pulse-text {
       0%, 100% { opacity: 0.4; }
@@ -189,6 +192,7 @@
       cursor: none;
       transition: border-color 0.2s, color 0.2s, background 0.2s;
       user-select: none;
+      touch-action: manipulation;
     }
     .music-btn:hover { border-color: #555; color: #fff; background: #111; }
 
@@ -251,6 +255,9 @@
       opacity: 0;
       transition: opacity 0.3s ease, transform 0.3s ease;
       pointer-events: none;
+      text-align: center;
+      width: max-content;
+      max-width: 90vw;
     }
     #toast.show {
       opacity: 1;
@@ -275,45 +282,22 @@
     .dot-offline { background: #555;    color: #555; }
 
     /* ─── Presence Card BG ─────────────────────────────────── */
-    #presence-card {
-      position: relative;
-      overflow: hidden;
-    }
+    #presence-card { position: relative; overflow: hidden; }
     #presence-bg {
-      position: absolute;
-      inset: 0;
-      background-image: url('bg.jpg');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.3;
+      position: absolute; inset: 0; background-image: url('bg.jpg'); background-size: cover; background-position: center; opacity: 0.3;
     }
     #presence-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(3,3,3,0.7) 0%, rgba(3,3,3,0.92) 100%);
+      position: absolute; inset: 0; background: linear-gradient(135deg, rgba(3,3,3,0.7) 0%, rgba(3,3,3,0.92) 100%);
     }
 
     /* ─── Accordion ────────────────────────────────────────── */
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.45s ease;
-    }
-    .accordion-content.open {
-      max-height: 500px;
-    }
-    .accordion-chevron {
-      transition: transform 0.3s ease;
-    }
-    .accordion-chevron.open {
-      transform: rotate(180deg);
-    }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.45s ease; }
+    .accordion-content.open { max-height: 500px; }
+    .accordion-chevron { transition: transform 0.3s ease; }
+    .accordion-chevron.open { transform: rotate(180deg); }
 
     /* ─── Magnetic Button ──────────────────────────────────── */
-    .magnetic {
-      transition: transform 0.4s cubic-bezier(.23,1,.32,1);
-      display: inline-flex;
-    }
+    .magnetic { transition: transform 0.4s cubic-bezier(.23,1,.32,1); display: inline-flex; touch-action: manipulation; }
 
     /* ─── Scrollbar ────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 4px; }
@@ -321,199 +305,107 @@
     ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 2px; }
     ::-webkit-scrollbar-thumb:hover { background: #333; }
 
-    /* ─── SoundCloud iframes ───────────────────────────────── */
-    .sc-iframe { border: none; border-radius: 0; width: 100%; height: 120px; background: transparent; }
-
     /* ─── Section Label ────────────────────────────────────── */
     .section-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      color: #444;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; color: #444; text-transform: uppercase; margin-bottom: 0.5rem;
     }
     .section-title {
-      font-family: 'Inter', sans-serif;
-      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-      font-weight: 600;
-      color: #fff;
+      font-family: 'Inter', sans-serif; font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-weight: 600; color: #fff;
     }
 
     /* ─── Lang Toggle ──────────────────────────────────────── */
     .lang-btn {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 0.3rem 0.65rem;
-      border: 1px solid #1a1a1a;
-      color: #555;
-      background: transparent;
-      cursor: none;
-      transition: all 0.2s;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; padding: 0.3rem 0.65rem; border: 1px solid #1a1a1a; color: #555; background: transparent; cursor: none; transition: all 0.2s; touch-action: manipulation;
     }
-    .lang-btn.active {
-      border-color: #fff;
-      color: #fff;
-    }
-    .lang-btn:not(.active):hover {
-      border-color: #333;
-      color: #888;
-    }
-
-    /* ─── Copy Button ──────────────────────────────────────── */
-    .copy-btn {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 0.75rem 1.5rem;
-      border: 1px solid #1a1a1a;
-      background: #080808;
-      color: #888;
-      cursor: none;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
-      user-select: none;
-    }
-    .copy-btn:hover {
-      border-color: #333;
-      color: #fff;
-      background: #0d0d0d;
-      transform: translateY(-2px);
-    }
+    .lang-btn.active { border-color: #fff; color: #fff; }
+    .lang-btn:not(.active):hover { border-color: #333; color: #888; }
 
     /* ─── Social Card Link ─────────────────────────────────── */
     .social-card {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1.25rem 1.5rem;
-      background: transparent;
-      border: 1px solid #1a1a1a;
-      text-decoration: none;
-      color: #fff;
-      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: transparent; border: 1px solid #1a1a1a; text-decoration: none; color: #fff; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
     }
-    .social-card:hover {
-      border-color: #333;
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-    }
+    .social-card:hover { border-color: #333; transform: translateY(-3px) scale(1.01); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
 
     /* ─── Misc ─────────────────────────────────────────────── */
     .mono { font-family: 'JetBrains Mono', monospace; }
     .tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      padding: 0.25rem 0.6rem;
-      border: 1px solid #1a1a1a;
-      color: #555;
-      display: inline-block;
-      transition: all 0.2s;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; padding: 0.25rem 0.6rem; border: 1px solid #1a1a1a; color: #555; display: inline-block; transition: all 0.2s;
     }
-    .tag:hover {
-      border-color: #444;
-      color: #ccc;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255,255,255,0.05);
-    }
+    .tag:hover { border-color: #444; color: #ccc; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,255,255,0.05); }
     hr.divider { border: none; border-top: 1px solid #1a1a1a; }
     a { text-decoration: none; color: inherit; }
     button { cursor: none; }
-
-    /* ─── Friend Card in Accordion ──────────────────────────── */
-    .friend-card {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.25rem;
-      background: #0a0a0a;
-      border: 1px solid #1a1a1a;
-      transition: border-color 0.2s;
-    }
-    .friend-card:hover { border-color: #2a2a2a; }
-
-    /* ─── Responsive tweaks ────────────────────────────────── */
-    @media (max-width: 640px) {
-      #cursor-dot, #cursor-ring { display: none; }
-      body { cursor: auto; }
-      .magnetic { transform: none !important; }
-      /* Mobile Terminal Tweaks */
-      #terminal-output { font-size: 0.75rem; word-break: break-all; }
-      #terminal-input { font-size: 0.75rem; }
-      .card { padding: 1rem !important; }
-    }
-
-    /* ─── Emergency Mode ───────────────────────────────────── */
-    html.emergency-mode {
-      filter: invert(1) hue-rotate(180deg);
-      background: #fff;
-    }
-    html.emergency-mode img, 
-    html.emergency-mode video, 
-    html.emergency-mode iframe {
-      filter: invert(1) hue-rotate(180deg);
-    }
+    
+    .interactive { touch-action: manipulation; }
 
     /* ─── Animations & Neon ────────────────────────────────── */
-    .neon-icon {
-      filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
-    }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-      100% { transform: translateY(0px); }
-    }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
     .floating { animation: float 6s ease-in-out infinite; }
     
     .glitch-hover:hover {
-      animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-      color: #fff;
-      text-shadow: 2px 0 #23d160, -2px 0 #4488ff;
+      animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite; color: #fff; text-shadow: 2px 0 #23d160, -2px 0 #4488ff;
     }
     @keyframes glitch-anim {
-      0% { transform: translate(0) }
-      20% { transform: translate(-2px, 1px) }
-      40% { transform: translate(-1px, -1px) }
-      60% { transform: translate(2px, 1px) }
-      80% { transform: translate(1px, -1px) }
-      100% { transform: translate(0) }
+      0% { transform: translate(0) } 20% { transform: translate(-2px, 1px) } 40% { transform: translate(-1px, -1px) } 60% { transform: translate(2px, 1px) } 80% { transform: translate(1px, -1px) } 100% { transform: translate(0) }
     }
     
-    .ascii-art {
-      display: inline-block;
-      transform: perspective(600px) rotateX(calc(var(--my, 0) * -15deg)) rotateY(calc(var(--mx, 0) * 15deg));
-      transition: transform 0.1s ease-out;
-      transform-style: preserve-3d;
-      will-change: transform;
-    }
-
-    /* Lucide SVGs fix for solid black issue */
-    svg.lucide {
-      stroke: currentColor;
-      fill: none;
-    }
-
-    /* Timeline Hover Easter Egg */
+    .ascii-art { display: inline-block; transform: perspective(600px) rotateX(calc(var(--my, 0) * -15deg)) rotateY(calc(var(--mx, 0) * 15deg)); transition: transform 0.1s ease-out; transform-style: preserve-3d; will-change: transform; }
+    svg.lucide { stroke: currentColor; fill: none; }
+    
     .timeline-hover .timeline-title { transition: color 0.2s ease; }
     .timeline-hover:hover .timeline-title { color: #ff4444 !important; }
     .timeline-hover:hover .timeline-title::after {
-      content: ' (unless global judgment happens)';
-      font-size: 0.65rem;
-      color: #ff4444;
-      font-family: 'JetBrains Mono', monospace;
-      margin-left: 0.4rem;
-      vertical-align: middle;
-      opacity: 0.9;
+      content: ' (unless global judgment happens)'; font-size: 0.65rem; color: #ff4444; font-family: 'JetBrains Mono', monospace; margin-left: 0.4rem; vertical-align: middle; opacity: 0.9;
     }
-    :lang(ru) .timeline-hover:hover .timeline-title::after {
-      content: ' (если не случится глобальный суд)';
+    :lang(ru) .timeline-hover:hover .timeline-title::after { content: ' (если не случится глобальный суд)'; }
+
+    /* ════════════════════════════════════════════════════════
+       📱 MOBILE OPTIMIZATIONS (Max-width: 768px)
+    ══════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      /* Возвращаем стандартный курсор на мобилках */
+      body, button, a, .interactive, input, * { cursor: auto !important; }
+      #cursor-dot, #cursor-ring { display: none !important; }
+
+      /* Шапка сайта */
+      .header-container { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; padding: 0.85rem 1rem !important; }
+      .header-controls { width: 100%; justify-content: space-between; }
+      
+      /* Перенос Music Controls вниз на мобилках */
+      #music-controls {
+        top: auto !important; bottom: 1rem !important; left: 1rem !important; right: 1rem !important;
+        background: rgba(8, 8, 8, 0.85); backdrop-filter: blur(10px);
+        padding: 0.5rem; border: 1px solid #1a1a1a; border-radius: 8px;
+        justify-content: space-between; z-index: 9999;
+      }
+      #now-playing-box { display: none !important; } /* Скрываем длинное название трека для экономии места */
+      #music-controls .music-btn { flex: 1; text-align: center; }
+      
+      /* Глаз (Cyber eye) */
+      #cyber-eye { bottom: 4.5rem !important; right: 1rem !important; width: 36px !important; height: 36px !important; }
+
+      /* Сброс сетки на 1 колонку */
+      .mobile-grid-1 { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+      
+      /* Уменьшение отступов секций */
+      .section-padding { padding: 1rem !important; }
+      .hero-padding { padding: 3rem 1rem 2rem !important; }
+
+      /* Lock Screen text fix */
+      #lock-title { font-size: clamp(2rem, 12vw, 3.5rem) !important; }
+      #lock-screen > div { padding: 0 1rem; word-break: break-word; }
+
+      /* Terminal UI Fix */
+      .sys-info-row { gap: 0.5rem !important; }
+      .sys-info-row > div { min-width: 45% !important; margin-bottom: 0.5rem; }
+      /* Важно для iOS: font-size >= 16px предотвращает автозум в инпуте */
+      #terminal-input { font-size: 16px !important; padding: 0.2rem; } 
+      
+      /* Presence Card */
+      #presence-card-content { flex-direction: column; text-align: center; justify-content: center; }
+      
+      /* Decompiler Modal */
+      #decompiler-modal { padding: 1rem !important; }
     }
   </style>
 </head>
@@ -536,33 +428,27 @@
       <div style="height:0.5rem;"></div>
       <div id="lock-prompt">[ Click to initialize ]</div>
     </div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#2a2a2a;letter-spacing:0.15em;margin-top:3rem;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#2a2a2a;letter-spacing:0.15em;margin-top:3rem;text-align:center;">
       SYS v2.6.0 // BOOT SEQUENCE READY
     </div>
   </div>
 
   <!-- ░░ HIDDEN SC PLAYER ░░ -->
   <div id="sc-player-hidden" aria-hidden="true">
-    <iframe
-      id="sc-iframe-hidden"
-      width="100%"
-      height="166"
-      scrolling="no"
-      frameborder="no"
-      allow="autoplay"
+    <iframe id="sc-iframe-hidden" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
       src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/nid_1/pharaoh-black-siemens-slow-version-remix-by-nid&color=%23ffffff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false">
     </iframe>
   </div>
 
   <!-- ░░ MUSIC CONTROLS ░░ -->
-  <div id="music-controls" aria-label="Music controls" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+  <div id="music-controls" aria-label="Music controls" style="display: flex; gap: 0.5rem; align-items: center;">
     <button class="music-btn interactive" id="btn-play-pause" onclick="togglePlayPause()">▶ PLAY</button>
     <button class="music-btn interactive" onclick="nextTrack()">» NEXT</button>
     
-    <div style="display:flex;align-items:center;gap:0.5rem;background:#080808;border:1px solid #1a1a1a;padding:0.35rem 0.5rem;height:100%;">
+    <div style="display:flex;align-items:center;gap:0.5rem;background:#080808;border:1px solid #1a1a1a;padding:0.35rem 0.5rem;height:100%;flex:1;justify-content:center;">
       <i data-lucide="volume-2" style="width:12px;height:12px;color:#888;"></i>
       <input type="range" id="volume-slider" min="0" max="100" value="50" class="interactive"
-             style="width:50px;accent-color:#555;cursor:none;background:transparent;outline:none;" aria-label="Volume">
+             style="width:100%;max-width:50px;accent-color:#555;cursor:pointer;background:transparent;outline:none;" aria-label="Volume">
     </div>
 
     <div id="now-playing-box" style="display: flex; align-items: center; gap: 0.5rem; background: #080808; border: 1px solid #1a1a1a; padding: 0.35rem 0.75rem; opacity: 0; transition: opacity 0.3s ease;">
@@ -580,14 +466,14 @@
   <div id="main-content" style="opacity:0;transition:opacity 0.8s ease;will-change:transform;transform-origin:center top;">
 
     <!-- ░░ HEADER ░░ -->
-    <header style="position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.85);backdrop-filter:blur(12px);border-bottom:1px solid #1a1a1a;padding:0.85rem 0;">
-      <div style="max-width:900px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+    <header style="position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.85);backdrop-filter:blur(12px);border-bottom:1px solid #1a1a1a;">
+      <div class="header-container" style="max-width:900px;margin:0 auto;padding:0.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
         <!-- Logo -->
         <div style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;font-weight:700;letter-spacing:0.08em;color:#fff;">
           FOG1CH<span style="color:#444;">.</span>
         </div>
         <!-- Right: Clock + Lang + Emergency + Inspect -->
-        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+        <div class="header-controls" style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
           <div style="display:flex;gap:0.5rem;">
             <button class="interactive mono" onclick="openDecompiler()" style="background:transparent;border:1px solid #4488ff;color:#4488ff;font-size:0.6rem;padding:0.2rem 0.5rem;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#4488ff';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#4488ff'">[ INSPECT ]</button>
             <button class="interactive mono" onclick="document.documentElement.classList.toggle('emergency-mode')" style="background:transparent;border:1px solid #ff4444;color:#ff4444;font-size:0.6rem;padding:0.2rem 0.5rem;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#ff4444';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#ff4444'">[ EMERGENCY ]</button>
@@ -602,10 +488,10 @@
     </header>
 
     <!-- ░░ HERO ░░ -->
-    <section style="max-width:900px;margin:0 auto;padding:5rem 1.5rem 3rem;">
+    <section class="hero-padding" style="max-width:900px;margin:0 auto;padding:5rem 1.5rem 3rem;">
       <div class="reveal" style="transition-delay:0.1s;">
         <p class="section-label">&gt; INITIALIZE.PROFILE</p>
-        <h1 id="typing-text" class="glitch-hover interactive" style="font-family:'JetBrains Mono',monospace;font-size:clamp(3rem,9vw,6.5rem);font-weight:700;letter-spacing:-0.03em;line-height:1;margin-bottom:1.5rem;color:#fff;transition:text-shadow 0.2s;"></h1>
+        <h1 id="typing-text" class="glitch-hover interactive" style="font-family:'JetBrains Mono',monospace;font-size:clamp(3rem,10vw,6.5rem);font-weight:700;letter-spacing:-0.03em;line-height:1;margin-bottom:1.5rem;color:#fff;transition:text-shadow 0.2s;"></h1>
         <p id="hero-bio" style="font-size:1.1rem;color:#888;max-width:520px;line-height:1.7;font-weight:300;"></p>
       </div>
       <div class="reveal" style="transition-delay:0.25s;margin-top:2rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
@@ -617,14 +503,13 @@
     </section>
 
     <!-- ░░ PRESENCE / DISCORD ░░ -->
-    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+    <section class="section-padding" style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
       <div class="reveal" style="transition-delay:0.15s;width:100%;">
         <p class="section-label">&gt; SYS.PRESENCE // DISCORD_LANYARD</p>
         <div id="presence-card" class="card" style="padding:0;min-height:180px;">
           <div id="presence-bg"></div>
           <div id="presence-overlay"></div>
-          <!-- content above overlays -->
-          <div style="position:relative;z-index:2;padding:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+          <div id="presence-card-content" style="position:relative;z-index:2;padding:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
             <!-- Avatar -->
             <div style="position:relative;flex-shrink:0;">
               <img id="presence-avatar" class="floating" src="https://i.pinimg.com/736x/d5/f2/0c/d5f20c5325d94301345c43a293a0b150.jpg" alt="Avatar"
@@ -634,13 +519,13 @@
             </div>
             <!-- Info -->
             <div style="flex:1;min-width:200px;">
-              <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;">
+              <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;flex-wrap:wrap;">
                 <span style="font-weight:600;font-size:1.1rem;color:#fff;">Fog1ch</span>
                 <span id="presence-status-text" class="mono" style="font-size:0.65rem;letter-spacing:0.15em;color:#555;">OFFLINE</span>
               </div>
               <div id="presence-custom-status" style="font-size:0.8rem;color:#666;margin-bottom:1rem;font-style:italic;"></div>
               <!-- Terminal activity -->
-              <div style="background:rgba(0,0,0,0.5);border:1px solid #111;padding:0.75rem 1rem;width:100%;max-width:400px;">
+              <div style="background:rgba(0,0,0,0.5);border:1px solid #111;padding:0.75rem 1rem;width:100%;max-width:400px;text-align:left;">
                 <div id="presence-activity" class="mono" style="font-size:0.72rem;color:#555;line-height:1.6;">
                   &gt; SYS.IDLE // No active tasks
                 </div>
@@ -651,19 +536,18 @@
       </div>
     </section>
 
-
     <!-- ░░ HARDWARE / SETUP (ACCORDION) ░░ -->
-    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+    <section class="section-padding" style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
       <div class="reveal card" style="transition-delay:0.1s;padding:0;overflow:hidden;background:transparent;border:none;">
-        <button class="interactive" onclick="toggleGeneric('hw-content', 'hw-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:center;align-items:center;cursor:none;outline:none;position:relative;">
+        <button class="interactive" onclick="toggleGeneric('hw-content', 'hw-chevron')" style="width:100%;padding:1.5rem 0;background:transparent;border:none;color:#fff;display:flex;justify-content:center;align-items:center;outline:none;position:relative;">
           <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
             <p class="section-label" style="text-align:center;margin-bottom:0.2rem;">&gt; HW.SETUP // DEVICE_SPECS</p>
             <h2 class="section-title" data-i18n="hw_title" style="margin:0;">Hardware Setup</h2>
           </div>
-          <i id="hw-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+          <i id="hw-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:0.5rem;transform:rotate(180deg);"></i>
         </button>
         <div id="hw-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;padding:0 0 1.5rem 0;">
+          <div class="mobile-grid-1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;padding:0 0 1.5rem 0;">
             <!-- Laptop -->
             <div class="card floating" style="padding:1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;">
               <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:1.25rem;">
@@ -732,18 +616,19 @@
         </div>
       </div>
     </section>
+
     <!-- ░░ SKILLS & TIMELINE (ACCORDION) ░░ -->
-    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+    <section class="section-padding" style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
       <div class="reveal card" style="transition-delay:0.1s;padding:0;overflow:hidden;background:transparent;border:none;">
-        <button class="interactive" onclick="toggleGeneric('st-content', 'st-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:none;outline:none;position:relative;">
+        <button class="interactive" onclick="toggleGeneric('st-content', 'st-chevron')" style="width:100%;padding:1.5rem 0;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;outline:none;position:relative;">
           <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
             <p class="section-label" style="margin-bottom:0.2rem;">&gt; SYS.PATH // SKILLS & ROADMAP</p>
             <h2 class="section-title" style="margin:0;">Journey & Matrix</h2>
           </div>
-          <i id="st-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+          <i id="st-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:0.5rem;transform:rotate(180deg);"></i>
         </button>
         <div id="st-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2.5rem;text-align:center;padding:0 0 1.5rem 0;">
+          <div class="mobile-grid-1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2.5rem;text-align:center;padding:0 0 1.5rem 0;">
             
             <!-- Skills -->
             <div style="display:flex;flex-direction:column;align-items:center;">
@@ -832,7 +717,7 @@
                   <div style="position:absolute;left:-1.6rem;top:0.2rem;width:8px;height:8px;background:#555;border-radius:50%;"></div>
                   <div class="mono" style="font-size:0.65rem;color:#888;margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem;">
                     <span data-i18n="time_4_date">FUTURE</span>
-                    <button class="interactive" onclick="triggerJudgmentOverlay()" style="background:#111;border:1px solid #333;color:#888;font-size:0.6rem;padding:0.1rem 0.35rem;border-radius:4px;cursor:none;transition:color 0.2s, border-color 0.2s;" onmouseover="this.style.color='#fff';this.style.borderColor='#555'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">?</button>
+                    <button class="interactive" onclick="triggerJudgmentOverlay()" style="background:#111;border:1px solid #333;color:#888;font-size:0.6rem;padding:0.1rem 0.35rem;border-radius:4px;cursor:pointer;transition:color 0.2s, border-color 0.2s;" onmouseover="this.style.color='#fff';this.style.borderColor='#555'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">?</button>
                   </div>
                   <div class="timeline-title" style="font-size:0.95rem;color:#ccc;font-weight:600;margin-bottom:0.3rem;" data-i18n="time_4_title">Graduation & Career</div>
                   <div style="font-size:0.8rem;color:#555;line-height:1.5;" data-i18n="time_4_desc">Becoming a full-time Senior AI / Software Engineer. The real game begins.</div>
@@ -845,15 +730,15 @@
 
       <!-- ░░ CURRENT PEAK (TECH STACK EXPLORER) ░░ -->
       <div class="reveal card" style="transition-delay:0.3s;margin-top:2rem;padding:0;background:#050505;border:none;overflow:hidden;">
-        <button class="interactive" onclick="toggleGeneric('peak-content', 'peak-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:none;outline:none;position:relative;">
+        <button class="interactive" onclick="toggleGeneric('peak-content', 'peak-chevron')" style="width:100%;padding:1.5rem 1rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;outline:none;position:relative;">
           <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
             <p class="section-label" style="margin-bottom:0.2rem;">&gt; SYS.PEAK // CURRENT OBJECTIVES</p>
             <h2 class="section-title" data-i18n="peak_title" style="margin:0;">Expedition: AI & Core</h2>
           </div>
-          <i id="peak-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+          <i id="peak-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1rem;transform:rotate(180deg);"></i>
         </button>
         <div id="peak-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
-          <div style="display:flex; flex-wrap:wrap; gap: 2rem; padding:0 1.5rem 1.5rem 1.5rem; align-items:center;">
+          <div style="display:flex; flex-wrap:wrap; gap: 2rem; padding:0 1rem 1.5rem 1rem; align-items:center;">
             <div style="flex:1; min-width:250px;">
               <p class="mono" style="color:#aaa;font-size:0.8rem;margin-bottom:0.25rem;"><span data-i18n="peak_status">STATUS:</span> Base Camp (Acclimatization)</p>
               <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:1rem;">
@@ -874,7 +759,7 @@
                 </div>
               </div>
             </div>
-            <div style="font-family:monospace;font-size:0.65rem;color:#333;white-space:pre;line-height:1.2;text-align:center;flex-shrink:0;margin:0 auto;">
+            <div style="font-family:monospace;font-size:0.65rem;color:#333;white-space:pre;line-height:1.2;text-align:center;flex-shrink:0;margin:0 auto; overflow-x: auto; max-width: 100%;">
          /\
         /  \
        /    \
@@ -892,19 +777,19 @@
 
       <!-- ░░ WROCLAW & COUNTDOWN ACCORDION ░░ -->
       <div class="reveal card" style="transition-delay:0.4s;margin-top:2rem;background:#050505;padding:0;overflow:hidden;">
-        <button class="interactive" onclick="toggleWroclaw()" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:0.75rem;cursor:none;outline:none;position:relative;">
+        <button class="interactive" onclick="toggleWroclaw()" style="width:100%;padding:1.5rem 1rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:0.75rem;outline:none;position:relative;">
           <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
             <p class="section-label" style="margin-bottom:0.2rem;">&gt; SYS.NODE // WROCŁAW_DATA</p>
             <h2 class="section-title" style="margin:0;font-size:1.1rem;"><i data-lucide="satellite" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:0.4rem;"></i>Wrocław Telemetry</h2>
           </div>
-          <i id="wroclaw-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;"></i>
+          <i id="wroclaw-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1rem;"></i>
         </button>
         <div id="wroclaw-content" class="accordion-content" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
           <hr class="divider" />
-          <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem;">
+          <div style="padding:1.25rem 1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem;">
             <div style="width:100%;">
               <p style="color:#23d160;font-size:0.75rem;margin-bottom:0.5rem;" class="mono">[ T-MINUS TO ACADEMY 2026 ]</p>
-              <div id="countdown-el" style="font-size:1.5rem;font-weight:bold;color:#fff;font-family:monospace;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,255,255,0.2);">--d --h --m --s</div>
+              <div id="countdown-el" style="font-size:clamp(1.1rem, 5vw, 1.5rem);font-weight:bold;color:#fff;font-family:monospace;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,255,255,0.2);">--d --h --m --s</div>
             </div>
             <div style="width:100%;">
               <p style="color:#4488ff;font-size:0.75rem;margin-bottom:0.5rem;" class="mono">[ SENSOR DATA: WROCŁAW ]</p>
@@ -922,19 +807,19 @@
 
     </section>
     <!-- ░░ SOCIALS & NETWORK (ACCORDION) ░░ -->
-    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+    <section class="section-padding" style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
       <div class="reveal card" style="transition-delay:0.1s;padding:0;overflow:hidden;background:transparent;border:none;">
-        <button class="interactive" onclick="toggleGeneric('socials-content', 'socials-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:none;outline:none;position:relative;">
+        <button class="interactive" onclick="toggleGeneric('socials-content', 'socials-chevron')" style="width:100%;padding:1.5rem 0;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;outline:none;position:relative;">
           <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
             <p class="section-label" style="margin-bottom:0.2rem;">&gt; EXT.LINKS // SOCIAL_GRAPH</p>
             <h2 class="section-title" data-i18n="socials_title" style="margin:0;">Socials & Network</h2>
           </div>
-          <i id="socials-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+          <i id="socials-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:0.5rem;transform:rotate(180deg);"></i>
         </button>
         <div id="socials-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
           <div style="padding:0 0 1.5rem 0;">
             <!-- Social cards -->
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1.25rem;">
+            <div class="mobile-grid-1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1.25rem;">
               <a class="social-card interactive" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.75rem;" href="https://t.me/Fog1ch0" target="_blank" rel="noopener">
                 <i data-lucide="send" style="width:22px;height:22px;color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"></i>
                 <div>
@@ -960,7 +845,7 @@
 
             <!-- Accordion: Network / Team -->
             <div class="card" style="overflow:hidden;margin-top:1.5rem;">
-              <button class="interactive" onclick="toggleGeneric('net-content', 'net-chevron')" style="width:100%;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:0.75rem;background:transparent;border:none;cursor:none;text-align:center;position:relative;">
+              <button class="interactive" onclick="toggleGeneric('net-content', 'net-chevron')" style="width:100%;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:0.75rem;background:transparent;border:none;text-align:center;position:relative;">
                 <div style="display:flex;align-items:center;gap:0.75rem;">
                   <i data-lucide="network" style="width:16px;height:16px;color:#444;"></i>
                   <span class="mono" style="font-size:0.75rem;letter-spacing:0.12em;color:#888;" data-i18n="network_label">NETWORK // TEAM</span>
@@ -990,11 +875,11 @@
       </div>
     </section>
     <!-- ░░ TERMINAL ░░ -->
-    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
-      <div class="reveal card" style="transition-delay:0.1s;background:#050505;padding:1.25rem 1.5rem;border:1px solid #333;overflow:hidden;">
+    <section class="section-padding" style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+      <div class="reveal card" style="transition-delay:0.1s;background:#050505;padding:1.25rem 1rem;border:1px solid #333;overflow:hidden;">
         
         <!-- Sys Info Row -->
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;border-bottom:1px dashed #1a1a1a;padding-bottom:1rem;justify-content:center;">
+        <div class="sys-info-row" style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;border-bottom:1px dashed #1a1a1a;padding-bottom:1rem;justify-content:center;">
           <div style="flex:1;min-width:120px;text-align:center;">
             <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="map-pin" style="width:10px;height:10px;"></i> LOCATION</div>
             <div class="mono" style="font-size:0.75rem;color:#888;">POLAND (EU)</div>
@@ -1012,22 +897,24 @@
             <div class="mono" id="client-info-el" style="font-size:0.7rem;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;margin:0 auto;">Detecting...</div>
           </div>
         </div>
-        <div id="terminal-output" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.5rem;max-height:300px;overflow-y:auto;padding-right:0.5rem;"></div>
-        <div style="display:flex;align-items:center;gap:0.75rem;">
-          <span class="mono" style="font-size:0.85rem;color:#23d160;">fog1ch@sys</span>
-          <span class="mono" style="font-size:0.85rem;color:#ccc;">:</span>
-          <span class="mono" style="font-size:0.85rem;color:#4488ff;">~</span>
-          <span class="mono" style="font-size:0.85rem;color:#ccc;">$</span>
-          <!-- A visual input field -->
+        <div id="terminal-output" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.5rem;max-height:300px;overflow-y:auto;padding-right:0.5rem; word-break: break-all;"></div>
+        <div style="display:flex;align-items:center;gap:0.5rem; flex-wrap: wrap;">
+          <div style="display:flex;align-items:center;gap:0.2rem;">
+            <span class="mono" style="font-size:0.85rem;color:#23d160;">fog1ch@sys</span>
+            <span class="mono" style="font-size:0.85rem;color:#ccc;">:</span>
+            <span class="mono" style="font-size:0.85rem;color:#4488ff;">~</span>
+            <span class="mono" style="font-size:0.85rem;color:#ccc;">$</span>
+          </div>
+          <!-- A visual input field (16px font on mobile is crucial to avoid iOS autozoom) -->
           <input type="text" id="terminal-input" class="mono interactive" 
-                 style="background:transparent;border:none;outline:none;color:#fff;font-size:0.85rem;flex:1;caret-color:#fff;"
+                 style="background:transparent;border:none;outline:none;color:#fff;font-size:0.85rem;flex:1;caret-color:#fff;min-width:150px;"
                  placeholder="Type 'help'..." spellcheck="false" autocomplete="off" />
         </div>
       </div>
     </section>
 
     <!-- ░░ FOOTER ░░ -->
-    <footer style="max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px solid #1a1a1a;">
+    <footer style="max-width:900px;margin:0 auto;padding:2rem 1.5rem 6rem;border-top:1px solid #1a1a1a;">
       <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:1rem;">
         <div class="mono" style="font-size:0.62rem;color:#2a2a2a;letter-spacing:0.15em;">
           © 2026 FOG1CH. // ALL_RIGHTS_RESERVED
@@ -1055,7 +942,7 @@
           <i data-lucide="terminal" style="width:14px; height:14px; color:#4488ff;"></i>
           <span class="mono" style="color:#888; font-size:0.75rem;">FOG1CH_DECOMPILER_v1.0.exe</span>
         </div>
-        <button class="interactive" onclick="closeDecompiler()" style="background:transparent; border:none; color:#ff4444; cursor:none; font-family:monospace; font-size:1.1rem; padding:0; line-height:1;">✕</button>
+        <button class="interactive" onclick="closeDecompiler()" style="background:transparent; border:none; color:#ff4444; font-family:monospace; font-size:1.1rem; padding:0; line-height:1;">✕</button>
       </div>
       <div style="padding:1.5rem; overflow-y:auto; max-height:70vh; font-family:'JetBrains Mono', monospace; font-size:0.85rem; line-height:1.6; color:#ccc;">
 <pre style="margin:0;"><span style="color:#555;">// ==========================================
@@ -1293,7 +1180,7 @@
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }
   function playTick() {
-    if (!audioCtx) return;
+    if (!audioCtx || window.innerWidth < 768) return; // Отключаем звук hover на мобильных
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
     osc.connect(gainNode);
@@ -1321,14 +1208,12 @@
     isUnlocking = true;
     initAudio();
 
-    // Hide original lock content
     document.getElementById('lock-title').style.display = 'none';
     document.getElementById('lock-prompt').style.display = 'none';
     
-    // Setup BIOS screen
     lockScreen.style.justifyContent = 'flex-start';
     lockScreen.style.alignItems = 'flex-start';
-    lockScreen.style.padding = '2rem';
+    lockScreen.style.padding = window.innerWidth < 768 ? '1rem' : '2rem';
     lockScreen.style.textAlign = 'left';
     lockScreen.style.cursor = 'wait';
     lockScreen.innerHTML = '';
@@ -1356,8 +1241,8 @@
         if (line !== "&nbsp;") playTick();
         lockScreen.innerHTML += `<div style="font-family:'JetBrains Mono',monospace;color:#ccc;font-size:0.85rem;margin-bottom:0.2rem;text-shadow:none;">${line}</div>`;
       }, delay);
-      delay += Math.random() * 150 + 50;
-      if (i === 4 || i === 9) delay += 400; // Fake pause
+      delay += Math.random() * 100 + 50;
+      if (i === 4 || i === 9) delay += 300; 
     });
 
     setTimeout(() => {
@@ -1366,7 +1251,6 @@
       mainContent.style.opacity = '1';
       document.getElementById('music-controls').classList.add('visible');
 
-      // Robust music start logic
       if (scWidget) {
         let playAttempts = 0;
         const tryPlay = () => {
@@ -1383,7 +1267,6 @@
         };
         tryPlay();
       }
-      // Trigger typing effect
       setTimeout(startTyping, 400);
     }, delay + 600);
   }
@@ -1506,13 +1389,11 @@
       return;
     }
 
-    // Status dot
     const statusMap = { 0: ['dot-online', 'status_online'], 1: ['dot-idle', 'status_idle'], 2: ['dot-dnd', 'status_dnd'], 3: ['dot-offline', 'status_offline'] };
     const sInfo = statusMap[data.discord_status === 'online' ? 0 : data.discord_status === 'idle' ? 1 : data.discord_status === 'dnd' ? 2 : 3] || statusMap[3];
     dotEl.className = `status-dot ${sInfo[0]}`;
     statEl.textContent = t(sInfo[1]);
 
-    // Custom status
     if (data.activities) {
       const custom = data.activities.find(a => a.type === 4);
       if (custom) {
@@ -1523,13 +1404,11 @@
       }
     }
 
-    // Activity
     if (!data.activities || data.activities.length === 0) {
       actEl.innerHTML = t('act_idle');
       return;
     }
 
-    // Spotify
     if (data.listening_to_spotify && data.spotify) {
       const sp = data.spotify;
       actEl.innerHTML =
@@ -1539,7 +1418,6 @@
       return;
     }
 
-    // Other activities (game, VS Code, etc.)
     const relevant = data.activities.filter(a => a.type !== 4);
     if (relevant.length > 0) {
       const act = relevant[0];
@@ -1559,7 +1437,6 @@
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Start polling immediately, then every 15s
   fetchLanyard();
   setInterval(fetchLanyard, 15000);
 
@@ -1568,7 +1445,6 @@
   ================================================================ */
   const cursorDot  = document.getElementById('cursor-dot');
   const cursorRing = document.getElementById('cursor-ring');
-
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
 
@@ -1578,17 +1454,16 @@
     window.globalMouseX = mouseX;
     window.globalMouseY = mouseY;
     
-    // For ASCII parallax
     const mx = (mouseX / window.innerWidth) * 2 - 1;
     const my = (mouseY / window.innerHeight) * 2 - 1;
     document.documentElement.style.setProperty('--mx', mx);
     document.documentElement.style.setProperty('--my', my);
 
-    // Translate with GPU acceleration
-    cursorDot.style.transform  = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-    cursorRing.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    if (window.innerWidth >= 768) {
+      cursorDot.style.transform  = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+      cursorRing.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    }
 
-    // Cyber eye logic
     const eye = document.getElementById('cyber-eye');
     const pupil = document.getElementById('cyber-pupil');
     if (eye && pupil) {
@@ -1596,7 +1471,6 @@
       const ex = rect.left + rect.width / 2;
       const ey = rect.top + rect.height / 2;
       const rad = Math.atan2(mouseY - ey, mouseX - ex);
-      // Max distance to keep pupil inside eye
       const maxDist = 14; 
       const dist = Math.min(maxDist, Math.hypot(mouseX - ex, mouseY - ey) * 0.05);
       pupil.style.transform = `translate(${Math.cos(rad) * dist}px, ${Math.sin(rad) * dist}px)`;
@@ -1609,7 +1483,6 @@
   function openDecompiler() {
     const modal = document.getElementById('decompiler-modal');
     modal.style.display = 'flex';
-    // Trigger reflow to apply transition
     void modal.offsetWidth;
     modal.style.opacity = '1';
   }
@@ -1619,12 +1492,13 @@
     setTimeout(() => { modal.style.display = 'none'; }, 300);
   }
 
-  // Hover on interactive elements
   function onInteractiveEnter() {
+    if (window.innerWidth < 768) return;
     cursorDot.classList.add('hovered');
     cursorRing.classList.add('hovered');
   }
   function onInteractiveLeave() {
+    if (window.innerWidth < 768) return;
     cursorDot.classList.remove('hovered');
     cursorRing.classList.remove('hovered');
   }
@@ -1650,6 +1524,7 @@
      MAGNETIC BUTTONS
   ================================================================ */
   function attachMagnetic() {
+    if (window.innerWidth < 768) return;
     document.querySelectorAll('.magnetic').forEach(el => {
       el.addEventListener('mousemove', function(e) {
         const rect = el.getBoundingClientRect();
@@ -1672,7 +1547,6 @@
   let currentScroll = window.scrollY;
   let currentSkew = 0;
 
-  // Background visualizer variables
   const bgCanvas = document.getElementById('bg-visualizer');
   const bgCtx = bgCanvas.getContext('2d');
   let bgTime = 0;
@@ -1685,21 +1559,18 @@
   resizeCanvas();
 
   function renderLoop() {
-    // Reveal
     const winH = window.innerHeight;
     reveals.forEach(el => {
       const top = el.getBoundingClientRect().top;
       if (top < winH - 40) el.classList.add('visible');
     });
 
-    // Skew Effect
     const targetScroll = window.scrollY;
     const scrollDelta = targetScroll - currentScroll;
     currentScroll = targetScroll;
     
-    // Smooth skew based on scroll velocity
     let targetSkew = scrollDelta * 0.05;
-    targetSkew = Math.max(-4, Math.min(4, targetSkew)); // Clamp between -4 and 4 degrees
+    targetSkew = Math.max(-4, Math.min(4, targetSkew)); 
     currentSkew += (targetSkew - currentSkew) * 0.1;
     
     if (Math.abs(currentSkew) > 0.01 || Math.abs(scrollDelta) > 0) {
@@ -1712,13 +1583,11 @@
       }
     }
 
-    // Oscilloscope (Visualizer)
     if (bgCtx) {
       bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
       
       let targetAmp = (typeof scPlaying !== 'undefined' && scPlaying) ? 50 + Math.random()*20 : 15;
       
-      // Mouse influence
       let mx = window.globalMouseX || bgCanvas.width/2;
       let my = window.globalMouseY || bgCanvas.height/2;
       let dist = Math.hypot(mx - bgCanvas.width/2, my - bgCanvas.height/2);
@@ -1727,12 +1596,12 @@
       bgCurrentAmp += (targetAmp - bgCurrentAmp) * 0.05;
       bgTime += (typeof scPlaying !== 'undefined' && scPlaying) ? 0.05 : 0.02;
 
-      bgCtx.lineWidth = 1.5;
+      bgCtx.lineWidth = window.innerWidth < 768 ? 1 : 1.5;
       for (let i = 0; i < 3; i++) {
         bgCtx.beginPath();
         let color = (typeof isEmergencyMode !== 'undefined' && isEmergencyMode) ? `rgba(0, 0, 0, ${0.1 + i*0.05})` : `rgba(68, 136, 255, ${0.1 + i*0.05})`;
         bgCtx.strokeStyle = color;
-        for (let x = 0; x < bgCanvas.width; x += 10) {
+        for (let x = 0; x < bgCanvas.width; x += 15) {
           let y = bgCanvas.height/2 + Math.sin(x*0.01 + bgTime + i) * bgCurrentAmp * Math.sin(x*0.002);
           if (x === 0) bgCtx.moveTo(x, y);
           else bgCtx.lineTo(x, y);
@@ -1764,34 +1633,13 @@
   function toggleWroclaw() {
     toggleGeneric('wroclaw-content', 'wroclaw-chevron');
   }
-  /* ================================================================
-     TOAST / COPY
-  ================================================================ */
-  let toastTimer = null;
-
-  function copyText(text, label) {
-    navigator.clipboard.writeText(text).then(() => {
-      showToast(`COPIED: ${label.toUpperCase()} // ${text}`);
-    }).catch(() => {
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity  = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showToast(`COPIED: ${label.toUpperCase()} // ${text}`);
-    });
-  }
 
   function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
     toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
   }
 
   function triggerGlitchError() {
@@ -1821,7 +1669,7 @@
       overlay.style.display = 'flex';
       overlay.style.alignItems = 'center';
       overlay.style.justifyContent = 'center';
-      overlay.style.fontSize = '4rem';
+      overlay.style.fontSize = 'clamp(2rem, 10vw, 4rem)';
       overlay.style.fontWeight = 'bold';
       overlay.style.color = '#ff4444';
       overlay.style.textAlign = 'center';
@@ -1863,19 +1711,18 @@
       }
     };
     const interval = setInterval(draw, 33);
-    
-    // Stop after 10 seconds or on click
     const endMatrix = () => {
       clearInterval(interval);
       if (document.body.contains(canvas)) document.body.removeChild(canvas);
       canvas.removeEventListener('click', endMatrix);
+      canvas.removeEventListener('touchstart', endMatrix);
     };
     canvas.addEventListener('click', endMatrix);
+    canvas.addEventListener('touchstart', endMatrix);
     setTimeout(endMatrix, 10000);
   }
 
   function triggerPanicCrash() {
-    // harsh glitch sound
     if (audioCtx) {
       const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
@@ -1898,7 +1745,7 @@
     panic.style.color = '#fff';
     panic.style.fontFamily = "'JetBrains Mono', monospace";
     panic.style.padding = '2rem';
-    panic.style.fontSize = '1.2rem';
+    panic.style.fontSize = 'clamp(0.8rem, 4vw, 1.2rem)';
     panic.style.whiteSpace = 'pre-wrap';
     panic.textContent = `KERNEL PANIC - NOT SYNCING: FATAL EXCEPTION
     
@@ -1919,7 +1766,6 @@ System halting...`;
       panic.style.backgroundColor = '#000';
       panic.textContent = '';
       
-      // reboot beep
       if (audioCtx) {
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
@@ -1939,9 +1785,6 @@ System halting...`;
     }, 2500);
   }
 
-  /* ================================================================
-     EASTER EGG (SCREAMER)
-  ================================================================ */
   function triggerScreamer() {
     const screamer = document.createElement('div');
     screamer.style.position = 'fixed';
@@ -1955,7 +1798,6 @@ System halting...`;
                           <audio autoplay><source src="https://www.myinstants.com/media/sounds/fnaf-jumpscare-sound.mp3" type="audio/mpeg"></audio>`;
     document.body.appendChild(screamer);
     
-    // Auto-remove after 3 seconds
     setTimeout(() => {
       if (document.body.contains(screamer)) {
         document.body.removeChild(screamer);
@@ -1963,9 +1805,6 @@ System halting...`;
     }, 3000);
   }
 
-  /* ================================================================
-     JUDGMENT OVERLAY
-  ================================================================ */
   function triggerJudgmentOverlay() {
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
@@ -1977,15 +1816,14 @@ System halting...`;
     overlay.style.flexDirection = 'column';
     overlay.style.alignItems = 'center';
     overlay.style.justifyContent = 'center';
-    overlay.style.padding = '2rem';
+    overlay.style.padding = '1rem';
     overlay.style.textAlign = 'center';
     
-    // Add close button
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '✕';
     closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '2rem';
-    closeBtn.style.right = '2rem';
+    closeBtn.style.top = '1.5rem';
+    closeBtn.style.right = '1.5rem';
     closeBtn.style.background = 'transparent';
     closeBtn.style.border = 'none';
     closeBtn.style.color = '#888';
@@ -2003,7 +1841,7 @@ System halting...`;
     const p1 = document.createElement('p');
     p1.style.fontFamily = "'JetBrains Mono', monospace";
     p1.style.color = '#fff';
-    p1.style.fontSize = '1.1rem';
+    p1.style.fontSize = 'clamp(0.9rem, 4vw, 1.1rem)';
     p1.style.lineHeight = '1.6';
     p1.style.marginBottom = '2rem';
     p1.innerHTML = currentLang === 'ru' 
@@ -2041,26 +1879,19 @@ System halting...`;
     overlay.appendChild(textWrap);
     document.body.appendChild(overlay);
 
-    // Reattach listeners to newly created interactive elements
     attachCursorListeners();
     attachMagnetic();
   }
 
   /* ================================================================
-     INIT
+     INIT TERMINAL & PAGE
   ================================================================ */
   document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Lucide icons
     if (typeof lucide !== 'undefined') lucide.createIcons();
-
-    // Apply default language
     applyI18n();
-
-    // Attach listeners
     attachCursorListeners();
     attachMagnetic();
 
-    // Terminal Logic
     const termInput = document.getElementById('terminal-input');
     const termOutput = document.getElementById('terminal-output');
     let cmdHistory = [];
@@ -2128,29 +1959,9 @@ System halting...`;
                 : 'https://www.jw.org/en/library/books/Insight-on-the-Scriptures/Money/';
             }, 500);
           } else if (cmd === 'portrait') {
-            const art = `MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMWXKNMMMMMMMMMMM
-MMMMMMMMMMMMMW0o'.c0WMMMMMMMMM
-MMMMMMMMMMMMNx,    .oXMMMMMMMM
-MMMMMMMMMMMWO;        ,OWMMMMM
-MMMMMMMMMMMXl.          .oXMMM
-MMMMMMMMMMK:     .';;;'.  :KMM
-MMMMMMMMMWd.   .xXWMMMWKo..dWM
-MMMMMMMMMK,   .dWMMMMMMMWk.,KM
-MMMMMMMMWd.   :XMMMMMMMMMWo.dW
-MMMMMMMMX:   .dWMMMMMMMMMWd.:X
-MMMMMMMMK,   .kMMMMMMMMMMWk.,K
-MMMMMMMMNc   .oWMMMMMMMMMWo.cN
-MMMMMMMMWx.   .oKWMMMMMNOc..dW
-MMMMMMMMMNl.    .,clllc'.  .lX
-MMMMMMMMMMXo.              .oX
-MMMMMMMMMMMWk'            'kWM
-MMMMMMMMMMMMW0l.        .l0WMM
-MMMMMMMMMMMMMMWKd;.  .;dKWMMMM
-MMMMMMMMMMMMMMMMMWXOOKWMMMMMMM`;
-            response = `<br><div class="ascii-art" style="font-size:0.45rem;line-height:0.45rem;color:#ccc;white-space:pre;font-weight:bold;">${art}</div><br>`;
+            const art = `MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM\nMMMMMMMMMMMMMMMWXKNMMMMMMMMMMM\nMMMMMMMMMMMMMW0o'.c0WMMMMMMMMM\nMMMMMMMMMMMMNx,    .oXMMMMMMMM\nMMMMMMMMMMMWO;        ,OWMMMMM\nMMMMMMMMMMMXl.          .oXMMM\nMMMMMMMMMMK:     .';;;'.  :KMM\nMMMMMMMMMWd.   .xXWMMMWKo..dWM\nMMMMMMMMMK,   .dWMMMMMMMMWk.,KM\nMMMMMMMMWd.   :XMMMMMMMMMWo.dW\nMMMMMMMMX:   .dWMMMMMMMMMWd.:X\nMMMMMMMMK,   .kMMMMMMMMMMWk.,K\nMMMMMMMMNc   .oWMMMMMMMMMWo.cN\nMMMMMMMMWx.   .oKWMMMMMNOc..dW\nMMMMMMMMMNl.    .,clllc'.  .lX\nMMMMMMMMMMXo.              .oX\nMMMMMMMMMMMWk'            'kWM\nMMMMMMMMMMMMW0l.        .l0WMM\nMMMMMMMMMMMMMMWKd;.  .;dKWMMMM\nMMMMMMMMMMMMMMMMMWXOOKWMMMMMMM`;
+            response = `<br><div class="ascii-art" style="font-size:clamp(4px, 1vw, 0.45rem);line-height:1.2;color:#ccc;white-space:pre;font-weight:bold;">${art}</div><br>`;
           } else {
-            // Bad words check
             const badWords = ['nigger', 'nigga', 'fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'whore', 'slut', 'faggot', 'retard', 'kurwa', 'бля', 'сука', 'пиздец', 'ебать', 'хуй', 'пидор', 'гандон', 'шлюха'];
             const isBadWord = badWords.some(bw => cmd.includes(bw));
             
@@ -2181,15 +1992,9 @@ MMMMMMMMMMMMMMMMMWXOOKWMMMMMMM`;
         }
       });
     }
-
-    // Re-attach after icons render (short delay just in case)
-    setTimeout(() => {
-      attachCursorListeners();
-      attachMagnetic();
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }, 300);
   });
   </script>
 
 </body>
 </html>
+
