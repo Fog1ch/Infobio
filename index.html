@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fog1ch. — Portfolio</title>
+  <meta name="description" content="Software Engineering & AI enthusiast. Building the future from Poland." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- SoundCloud Widget API -->
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ultra-black': '#030303',
+            'card-bg': '#080808',
+            'border-default': '#1a1a1a',
+            'border-hover': '#333333',
+            'text-muted': '#888888',
+            'text-dim': '#555555',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #030303;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      cursor: none;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    body.locked { overflow: hidden; }
+
+    /* ─── CRT Scanlines ────────────────────────────────────── */
+    #scanlines {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.18) 2px,
+        rgba(0,0,0,0.18) 4px
+      );
+      background-size: 100% 4px;
+      opacity: 0.4;
+      animation: scanlines-scroll 10s linear infinite;
+    }
+    @keyframes scanlines-scroll {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 40px; }
+    }
+
+    /* ─── Custom Cursor ────────────────────────────────────── */
+    #cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999999;
+      box-shadow: 0 0 8px 2px rgba(255,255,255,0.8);
+      transform: translate3d(-50%, -50%, 0);
+      transition: opacity 0.2s, width 0.2s, height 0.2s;
+    }
+    #cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999998;
+      transform: translate3d(-50%, -50%, 0);
+      /* NO transition on position — only on size/color */
+      transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background 0.25s ease, backdrop-filter 0.25s ease;
+    }
+    #cursor-ring.hovered {
+      width: 52px;
+      height: 52px;
+      border-color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(2px);
+    }
+    #cursor-dot.hovered {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* ─── Lock Screen ──────────────────────────────────────── */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9997;
+      background: #030303;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #lock-screen.dismissed {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #lock-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    #lock-prompt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #555;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: pulse-text 2s infinite ease-in-out;
+    }
+    @keyframes pulse-text {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    @keyframes blink-anim {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ─── Music Controls ───────────────────────────────────── */
+    #music-controls {
+      position: fixed;
+      top: 1.25rem;
+      left: 1.25rem;
+      z-index: 200;
+      display: flex;
+      gap: 0.5rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #music-controls.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .music-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 0.45rem 0.85rem;
+      background: #080808;
+      border: 1px solid #1a1a1a;
+      color: #888;
+      cursor: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .music-btn:hover { border-color: #555; color: #fff; background: #111; }
+
+    /* ─── Hidden SoundCloud iframe ─────────────────────────── */
+    #sc-player-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* ─── Typing Effect ────────────────────────────────────── */
+    #typing-text::after {
+      content: '|';
+      animation: blink-anim 0.7s step-end infinite;
+      color: #fff;
+      margin-left: 2px;
+    }
+    #typing-text.done::after { display: none; }
+
+    /* ─── Scroll Reveal ────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Cards ────────────────────────────────────────────── */
+    .card {
+      background: #080808;
+      border: 1px solid #1a1a1a;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      border-color: #333;
+      transform: scale(1.01);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+    }
+
+    /* ─── Toast ────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #030303;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 0.6rem 1.4rem;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── Online Status Dot ─────────────────────────────────── */
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+      50%       { opacity: 0.85; box-shadow: 0 0 0 5px transparent; }
+    }
+    .dot-online  { background: #23d160; color: #23d160; }
+    .dot-idle    { background: #f5a623; color: #f5a623; }
+    .dot-dnd     { background: #e53e3e; color: #e53e3e; }
+    .dot-offline { background: #555;    color: #555; }
+
+    /* ─── Presence Card BG ─────────────────────────────────── */
+    #presence-card {
+      position: relative;
+      overflow: hidden;
+    }
+    #presence-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('bg.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+    }
+    #presence-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(3,3,3,0.7) 0%, rgba(3,3,3,0.92) 100%);
+    }
+
+    /* ─── Accordion ────────────────────────────────────────── */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s ease;
+    }
+    .accordion-content.open {
+      max-height: 500px;
+    }
+    .accordion-chevron {
+      transition: transform 0.3s ease;
+    }
+    .accordion-chevron.open {
+      transform: rotate(180deg);
+    }
+
+    /* ─── Magnetic Button ──────────────────────────────────── */
+    .magnetic {
+      transition: transform 0.4s cubic-bezier(.23,1,.32,1);
+      display: inline-flex;
+    }
+
+    /* ─── Scrollbar ────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #030303; }
+    ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #333; }
+
+    /* ─── SoundCloud iframes ───────────────────────────────── */
+    .sc-iframe { border: none; border-radius: 0; width: 100%; height: 120px; background: transparent; }
+
+    /* ─── Section Label ────────────────────────────────────── */
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: #444;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ─── Lang Toggle ──────────────────────────────────────── */
+    .lang-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.65rem;
+      border: 1px solid #1a1a1a;
+      color: #555;
+      background: transparent;
+      cursor: none;
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      border-color: #fff;
+      color: #fff;
+    }
+    .lang-btn:not(.active):hover {
+      border-color: #333;
+      color: #888;
+    }
+
+    /* ─── Copy Button ──────────────────────────────────────── */
+    .copy-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid #1a1a1a;
+      background: #080808;
+      color: #888;
+      cursor: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
+      user-select: none;
+    }
+    .copy-btn:hover {
+      border-color: #333;
+      color: #fff;
+      background: #0d0d0d;
+      transform: translateY(-2px);
+    }
+
+    /* ─── Social Card Link ─────────────────────────────────── */
+    .social-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: transparent;
+      border: 1px solid #1a1a1a;
+      text-decoration: none;
+      color: #fff;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .social-card:hover {
+      border-color: #333;
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    /* ─── Misc ─────────────────────────────────────────────── */
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid #1a1a1a;
+      color: #555;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    .tag:hover {
+      border-color: #444;
+      color: #ccc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+    }
+    hr.divider { border: none; border-top: 1px solid #1a1a1a; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: none; }
+
+    /* ─── Friend Card in Accordion ──────────────────────────── */
+    .friend-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: #0a0a0a;
+      border: 1px solid #1a1a1a;
+      transition: border-color 0.2s;
+    }
+    .friend-card:hover { border-color: #2a2a2a; }
+
+    /* ─── Responsive tweaks ────────────────────────────────── */
+    @media (max-width: 640px) {
+      #cursor-dot, #cursor-ring { display: none; }
+      body { cursor: auto; }
+      .magnetic { transform: none !important; }
+      /* Mobile Terminal Tweaks */
+      #terminal-output { font-size: 0.75rem; word-break: break-all; }
+      #terminal-input { font-size: 0.75rem; }
+      .card { padding: 1rem !important; }
+    }
+
+    /* ─── Emergency Mode ───────────────────────────────────── */
+    html.emergency-mode {
+      filter: invert(1) hue-rotate(180deg);
+      background: #fff;
+    }
+    html.emergency-mode img, 
+    html.emergency-mode video, 
+    html.emergency-mode iframe {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    /* ─── Animations & Neon ────────────────────────────────── */
+    .neon-icon {
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0px); }
+    }
+    .floating { animation: float 6s ease-in-out infinite; }
+    
+    .glitch-hover:hover {
+      animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+      color: #fff;
+      text-shadow: 2px 0 #23d160, -2px 0 #4488ff;
+    }
+    @keyframes glitch-anim {
+      0% { transform: translate(0) }
+      20% { transform: translate(-2px, 1px) }
+      40% { transform: translate(-1px, -1px) }
+      60% { transform: translate(2px, 1px) }
+      80% { transform: translate(1px, -1px) }
+      100% { transform: translate(0) }
+    }
+    
+    .ascii-art {
+      display: inline-block;
+      transform: perspective(600px) rotateX(calc(var(--my, 0) * -15deg)) rotateY(calc(var(--mx, 0) * 15deg));
+      transition: transform 0.1s ease-out;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Lucide SVGs fix for solid black issue */
+    svg.lucide {
+      stroke: currentColor;
+      fill: none;
+    }
+
+    /* Timeline Hover Easter Egg */
+    .timeline-hover .timeline-title { transition: color 0.2s ease; }
+    .timeline-hover:hover .timeline-title { color: #ff4444 !important; }
+    .timeline-hover:hover .timeline-title::after {
+      content: ' (unless global judgment happens)';
+      font-size: 0.65rem;
+      color: #ff4444;
+      font-family: 'JetBrains Mono', monospace;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+      opacity: 0.9;
+    }
+    :lang(ru) .timeline-hover:hover .timeline-title::after {
+      content: ' (если не случится глобальный суд)';
+    }
+  </style>
+</head>
+<body class="locked">
+
+  <!-- ░░ CRT SCANLINES ░░ -->
+  <div id="scanlines" aria-hidden="true"></div>
+
+  <!-- ░░ CUSTOM CURSOR ░░ -->
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- ░░ TOAST ░░ -->
+  <div id="toast" role="status" aria-live="polite">COPIED_TO_CLIPBOARD</div>
+
+  <!-- ░░ LOCK SCREEN ░░ -->
+  <div id="lock-screen" class="interactive" role="dialog" aria-label="Lock screen">
+    <div style="text-align:center;">
+      <div id="lock-title">Fog1ch.</div>
+      <div style="height:0.5rem;"></div>
+      <div id="lock-prompt">[ Click to initialize ]</div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#2a2a2a;letter-spacing:0.15em;margin-top:3rem;">
+      SYS v2.6.0 // BOOT SEQUENCE READY
+    </div>
+  </div>
+
+  <!-- ░░ HIDDEN SC PLAYER ░░ -->
+  <div id="sc-player-hidden" aria-hidden="true">
+    <iframe
+      id="sc-iframe-hidden"
+      width="100%"
+      height="166"
+      scrolling="no"
+      frameborder="no"
+      allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/nid_1/pharaoh-black-siemens-slow-version-remix-by-nid&color=%23ffffff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false">
+    </iframe>
+  </div>
+
+  <!-- ░░ MUSIC CONTROLS ░░ -->
+  <div id="music-controls" aria-label="Music controls" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+    <button class="music-btn interactive" id="btn-play-pause" onclick="togglePlayPause()">▶ PLAY</button>
+    <button class="music-btn interactive" onclick="nextTrack()">» NEXT</button>
+    
+    <div style="display:flex;align-items:center;gap:0.5rem;background:#080808;border:1px solid #1a1a1a;padding:0.35rem 0.5rem;height:100%;">
+      <i data-lucide="volume-2" style="width:12px;height:12px;color:#888;"></i>
+      <input type="range" id="volume-slider" min="0" max="100" value="50" class="interactive"
+             style="width:50px;accent-color:#555;cursor:none;background:transparent;outline:none;" aria-label="Volume">
+    </div>
+
+    <div id="now-playing-box" style="display: flex; align-items: center; gap: 0.5rem; background: #080808; border: 1px solid #1a1a1a; padding: 0.35rem 0.75rem; opacity: 0; transition: opacity 0.3s ease;">
+      <i data-lucide="music" style="width:12px;height:12px;color:#888;"></i>
+      <span id="now-playing-text" class="mono" style="font-size: 0.65rem; color: #ccc; letter-spacing: 0.05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">Pharaoh — Black Siemens</span>
+    </div>
+  </div>
+
+  <!-- ░░ PROCEDURAL BACKGROUND VISUALIZER ░░ -->
+  <canvas id="bg-visualizer" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;pointer-events:none;opacity:0.6;will-change:transform;"></canvas>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════════════ -->
+  <div id="main-content" style="opacity:0;transition:opacity 0.8s ease;will-change:transform;transform-origin:center top;">
+
+    <!-- ░░ HEADER ░░ -->
+    <header style="position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.85);backdrop-filter:blur(12px);border-bottom:1px solid #1a1a1a;padding:0.85rem 0;">
+      <div style="max-width:900px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+        <!-- Logo -->
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;font-weight:700;letter-spacing:0.08em;color:#fff;">
+          FOG1CH<span style="color:#444;">.</span>
+        </div>
+        <!-- Right: Clock + Lang + Emergency + Inspect -->
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+          <div style="display:flex;gap:0.5rem;">
+            <button class="interactive mono" onclick="openDecompiler()" style="background:transparent;border:1px solid #4488ff;color:#4488ff;font-size:0.6rem;padding:0.2rem 0.5rem;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#4488ff';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#4488ff'">[ INSPECT ]</button>
+            <button class="interactive mono" onclick="document.documentElement.classList.toggle('emergency-mode')" style="background:transparent;border:1px solid #ff4444;color:#ff4444;font-size:0.6rem;padding:0.2rem 0.5rem;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#ff4444';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#ff4444'">[ EMERGENCY ]</button>
+          </div>
+          <div id="live-clock" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:400;color:#555;letter-spacing:0.08em;"></div>
+          <div style="display:flex;gap:0.25rem;">
+            <button class="lang-btn interactive active" id="btn-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn interactive" id="btn-ru" onclick="setLang('ru')">RU</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ░░ HERO ░░ -->
+    <section style="max-width:900px;margin:0 auto;padding:5rem 1.5rem 3rem;">
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p class="section-label">&gt; INITIALIZE.PROFILE</p>
+        <h1 id="typing-text" class="glitch-hover interactive" style="font-family:'JetBrains Mono',monospace;font-size:clamp(3rem,9vw,6.5rem);font-weight:700;letter-spacing:-0.03em;line-height:1;margin-bottom:1.5rem;color:#fff;transition:text-shadow 0.2s;"></h1>
+        <p id="hero-bio" style="font-size:1.1rem;color:#888;max-width:520px;line-height:1.7;font-weight:300;"></p>
+      </div>
+      <div class="reveal" style="transition-delay:0.25s;margin-top:2rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
+        <span class="tag" data-i18n="tag_poland">🇵🇱 Poland</span>
+        <span class="tag" data-i18n="tag_se">Software Eng.</span>
+        <span class="tag" data-i18n="tag_ai">AI / ML</span>
+        <span class="tag">2026</span>
+      </div>
+    </section>
+
+    <!-- ░░ PRESENCE / DISCORD ░░ -->
+    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+      <div class="reveal" style="transition-delay:0.15s;width:100%;">
+        <p class="section-label">&gt; SYS.PRESENCE // DISCORD_LANYARD</p>
+        <div id="presence-card" class="card" style="padding:0;min-height:180px;">
+          <div id="presence-bg"></div>
+          <div id="presence-overlay"></div>
+          <!-- content above overlays -->
+          <div style="position:relative;z-index:2;padding:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+            <!-- Avatar -->
+            <div style="position:relative;flex-shrink:0;">
+              <img id="presence-avatar" class="floating" src="https://i.pinimg.com/736x/d5/f2/0c/d5f20c5325d94301345c43a293a0b150.jpg" alt="Avatar"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2272%22 height=%2272%22><rect width=%2272%22 height=%2272%22 fill=%22%23111%22/><text x=%2236%22 y=%2248%22 text-anchor=%22middle%22 font-size=%2228%22 fill=%22%23444%22>F</text></svg>'"
+                   style="width:80px;height:80px;border-radius:50%;border:2px solid #1a1a1a;object-fit:cover;" />
+              <span id="presence-status-dot" class="status-dot dot-offline" style="position:absolute;bottom:2px;right:6px;border:2px solid #030303;"></span>
+            </div>
+            <!-- Info -->
+            <div style="flex:1;min-width:200px;">
+              <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;">
+                <span style="font-weight:600;font-size:1.1rem;color:#fff;">Fog1ch</span>
+                <span id="presence-status-text" class="mono" style="font-size:0.65rem;letter-spacing:0.15em;color:#555;">OFFLINE</span>
+              </div>
+              <div id="presence-custom-status" style="font-size:0.8rem;color:#666;margin-bottom:1rem;font-style:italic;"></div>
+              <!-- Terminal activity -->
+              <div style="background:rgba(0,0,0,0.5);border:1px solid #111;padding:0.75rem 1rem;width:100%;max-width:400px;">
+                <div id="presence-activity" class="mono" style="font-size:0.72rem;color:#555;line-height:1.6;">
+                  &gt; SYS.IDLE // No active tasks
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ░░ HARDWARE / SETUP (ACCORDION) ░░ -->
+    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+      <div class="reveal card" style="transition-delay:0.1s;padding:0;overflow:hidden;background:transparent;border:none;">
+        <button class="interactive" onclick="toggleGeneric('hw-content', 'hw-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:center;align-items:center;cursor:none;outline:none;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <p class="section-label" style="text-align:center;margin-bottom:0.2rem;">&gt; HW.SETUP // DEVICE_SPECS</p>
+            <h2 class="section-title" data-i18n="hw_title" style="margin:0;">Hardware Setup</h2>
+          </div>
+          <i id="hw-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+        </button>
+        <div id="hw-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;padding:0 0 1.5rem 0;">
+            <!-- Laptop -->
+            <div class="card floating" style="padding:1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:1.25rem;">
+                <i data-lucide="laptop" style="width:18px;height:18px;color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.7));"></i>
+                <span class="mono" style="font-size:0.65rem;letter-spacing:0.15em;color:#444;">DEVICE_01 // LAPTOP</span>
+              </div>
+              <div style="width:100%;">
+                <div style="margin-bottom:0.6rem;">
+                  <div style="font-size:0.65rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;"><i data-lucide="info" style="width:12px;height:12px;"></i> <span data-i18n="hw_model">MODEL</span></div>
+                  <div class="mono" style="font-size:0.85rem;color:#ccc;">Lenovo IdeaPad Gaming 3-15</div>
+                </div>
+                <hr class="divider" style="margin:0.75rem 0;" />
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="monitor" style="width:10px;height:10px;"></i> GPU</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">RTX 3050 Ti</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="cpu" style="width:10px;height:10px;"></i> CPU</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">Ryzen 7</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="memory-stick" style="width:10px;height:10px;"></i> RAM</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">16 GB</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="hard-drive" style="width:10px;height:10px;"></i> STORAGE</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">512GB + 3TB</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Mobile -->
+            <div class="card floating" style="padding:1.5rem;animation-delay:0.5s;display:flex;flex-direction:column;align-items:center;text-align:center;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:1.25rem;">
+                <i data-lucide="smartphone" style="width:18px;height:18px;color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.7));"></i>
+                <span class="mono" style="font-size:0.65rem;letter-spacing:0.15em;color:#444;">DEVICE_02 // MOBILE</span>
+              </div>
+              <div style="width:100%;">
+                <div style="margin-bottom:0.6rem;">
+                  <div style="font-size:0.65rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;"><i data-lucide="info" style="width:12px;height:12px;"></i> <span data-i18n="hw_model">MODEL</span></div>
+                  <div class="mono" style="font-size:0.85rem;color:#ccc;">Samsung S23 Ultra</div>
+                </div>
+                <hr class="divider" style="margin:0.75rem 0;" />
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="hard-drive" style="width:10px;height:10px;"></i> STORAGE</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">1 TB</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="memory-stick" style="width:10px;height:10px;"></i> RAM</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">12 GB</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="monitor" style="width:10px;height:10px;"></i> DISPLAY</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">6.8" QHD+</div>
+                  </div>
+                  <div>
+                    <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="smartphone" style="width:10px;height:10px;"></i> OS</div>
+                    <div class="mono" style="font-size:0.75rem;color:#888;">Android 14</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ░░ SKILLS & TIMELINE (ACCORDION) ░░ -->
+    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+      <div class="reveal card" style="transition-delay:0.1s;padding:0;overflow:hidden;background:transparent;border:none;">
+        <button class="interactive" onclick="toggleGeneric('st-content', 'st-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:none;outline:none;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
+            <p class="section-label" style="margin-bottom:0.2rem;">&gt; SYS.PATH // SKILLS & ROADMAP</p>
+            <h2 class="section-title" style="margin:0;">Journey & Matrix</h2>
+          </div>
+          <i id="st-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+        </button>
+        <div id="st-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2.5rem;text-align:center;padding:0 0 1.5rem 0;">
+            
+            <!-- Skills -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <p class="section-label" style="text-align:center;">&gt; SYS.SKILLS // PROFICIENCY</p>
+              <h2 class="section-title" data-i18n="skills_title">Tech Matrix</h2>
+              <div style="display:flex;flex-direction:column;gap:1.5rem;margin-top:1.5rem;width:100%;max-width:350px;">
+                <!-- Python -->
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;align-items:flex-end;">
+                    <span class="mono" style="font-size:0.8rem;color:#ccc;display:flex;align-items:center;gap:0.5rem;">
+                      <i data-lucide="code" style="width:14px;height:14px;color:#23d160;"></i> Python
+                    </span>
+                    <span class="mono" style="font-size:0.65rem;color:#555;">[████████░░] 80%</span>
+                  </div>
+                  <div style="width:100%;height:3px;background:#1a1a1a;">
+                    <div style="width:80%;height:100%;background:#23d160;box-shadow:0 0 8px rgba(35,209,96,0.6);"></div>
+                  </div>
+                </div>
+                <!-- Math -->
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;align-items:flex-end;">
+                    <span class="mono" style="font-size:0.8rem;color:#ccc;display:flex;align-items:center;gap:0.5rem;">
+                      <i data-lucide="function-square" style="width:14px;height:14px;color:#4488ff;"></i> <span data-i18n="skill_math">Higher Math</span>
+                    </span>
+                    <span class="mono" style="font-size:0.65rem;color:#555;">[████████░░] 80%</span>
+                  </div>
+                  <div style="width:100%;height:3px;background:#1a1a1a;">
+                    <div style="width:80%;height:100%;background:#4488ff;box-shadow:0 0 8px rgba(68,136,255,0.6);"></div>
+                  </div>
+                </div>
+                <!-- AI / Prompt -->
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;align-items:flex-end;">
+                    <span class="mono" style="font-size:0.8rem;color:#ccc;display:flex;align-items:center;gap:0.5rem;">
+                      <i data-lucide="brain" style="width:14px;height:14px;color:#bd93f9;"></i> AI / Prompt Eng.
+                    </span>
+                    <span class="mono" style="font-size:0.65rem;color:#555;">[████████░░] 80%</span>
+                  </div>
+                  <div style="width:100%;height:3px;background:#1a1a1a;">
+                    <div style="width:80%;height:100%;background:#bd93f9;box-shadow:0 0 8px rgba(189,147,249,0.6);"></div>
+                  </div>
+                </div>
+                <!-- Web Design -->
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;align-items:flex-end;">
+                    <span class="mono" style="font-size:0.8rem;color:#ccc;display:flex;align-items:center;gap:0.5rem;">
+                      <i data-lucide="layout" style="width:14px;height:14px;color:#f5a623;"></i> Web Design
+                    </span>
+                    <span class="mono" style="font-size:0.65rem;color:#555;">[██████░░░░] 60%</span>
+                  </div>
+                  <div style="width:100%;height:3px;background:#1a1a1a;">
+                    <div style="width:60%;height:100%;background:#f5a623;box-shadow:0 0 8px rgba(245,166,35,0.6);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <p class="section-label" style="text-align:center;">&gt; USR.TIMELINE // ROADMAP</p>
+              <h2 class="section-title" data-i18n="timeline_title">Milestones</h2>
+              <div style="margin-top:1.5rem;border-left:1px dashed #333;padding-left:1.25rem;display:flex;flex-direction:column;gap:1.5rem;width:100%;max-width:350px;text-align:left;">
+                <!-- Node 1 -->
+                <div style="position:relative;">
+                  <div style="position:absolute;left:-1.6rem;top:0.2rem;width:8px;height:8px;background:#23d160;border-radius:50%;box-shadow:0 0 8px #23d160;"></div>
+                  <div class="mono" style="font-size:0.65rem;color:#888;margin-bottom:0.2rem;" data-i18n="time_1_date">2026 / PRESENT</div>
+                  <div style="font-size:0.95rem;color:#fff;font-weight:600;margin-bottom:0.3rem;" data-i18n="time_1_title">Admission to Technikum</div>
+                  <div style="font-size:0.8rem;color:#aaa;line-height:1.5;" data-i18n="time_1_desc">Started studying as a Software Engineering Technician with an AI focus in Poland.</div>
+                </div>
+                <!-- Node 2 -->
+                <div style="position:relative;">
+                  <div style="position:absolute;left:-1.6rem;top:0.2rem;width:8px;height:8px;background:#4488ff;border-radius:50%;box-shadow:0 0 8px #4488ff;animation:pulse-dot 2s infinite;"></div>
+                  <div class="mono" style="font-size:0.65rem;color:#888;margin-bottom:0.2rem;" data-i18n="time_2_date">2026 - 2031</div>
+                  <div style="font-size:0.95rem;color:#fff;font-weight:600;margin-bottom:0.3rem;" data-i18n="time_2_title">5-Year Grind</div>
+                  <div style="font-size:0.8rem;color:#aaa;line-height:1.5;" data-i18n="time_2_desc">Deep dive into programming, math, building complex projects, and surviving the matrix.</div>
+                </div>
+                <!-- Node 3 -->
+                <div style="position:relative;">
+                  <div style="position:absolute;left:-1.6rem;top:0.2rem;width:8px;height:8px;background:#f5a623;border-radius:50%;"></div>
+                  <div class="mono" style="font-size:0.65rem;color:#888;margin-bottom:0.2rem;" data-i18n="time_3_date">2031+</div>
+                  <div style="font-size:0.95rem;color:#ccc;font-weight:600;margin-bottom:0.3rem;" data-i18n="time_3_title">Higher Education</div>
+                  <div style="font-size:0.8rem;color:#aaa;line-height:1.5;" data-i18n="time_3_desc">Going for a university degree to level up the core fundamentals.</div>
+                </div>
+                <!-- Node 4 -->
+                <div style="position:relative;" class="timeline-hover">
+                  <div style="position:absolute;left:-1.6rem;top:0.2rem;width:8px;height:8px;background:#555;border-radius:50%;"></div>
+                  <div class="mono" style="font-size:0.65rem;color:#888;margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem;">
+                    <span data-i18n="time_4_date">FUTURE</span>
+                    <button class="interactive" onclick="triggerJudgmentOverlay()" style="background:#111;border:1px solid #333;color:#888;font-size:0.6rem;padding:0.1rem 0.35rem;border-radius:4px;cursor:none;transition:color 0.2s, border-color 0.2s;" onmouseover="this.style.color='#fff';this.style.borderColor='#555'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">?</button>
+                  </div>
+                  <div class="timeline-title" style="font-size:0.95rem;color:#ccc;font-weight:600;margin-bottom:0.3rem;" data-i18n="time_4_title">Graduation & Career</div>
+                  <div style="font-size:0.8rem;color:#555;line-height:1.5;" data-i18n="time_4_desc">Becoming a full-time Senior AI / Software Engineer. The real game begins.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ░░ CURRENT PEAK (TECH STACK EXPLORER) ░░ -->
+      <div class="reveal card" style="transition-delay:0.3s;margin-top:2rem;padding:0;background:#050505;border:none;overflow:hidden;">
+        <button class="interactive" onclick="toggleGeneric('peak-content', 'peak-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:none;outline:none;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
+            <p class="section-label" style="margin-bottom:0.2rem;">&gt; SYS.PEAK // CURRENT OBJECTIVES</p>
+            <h2 class="section-title" data-i18n="peak_title" style="margin:0;">Expedition: AI & Core</h2>
+          </div>
+          <i id="peak-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+        </button>
+        <div id="peak-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
+          <div style="display:flex; flex-wrap:wrap; gap: 2rem; padding:0 1.5rem 1.5rem 1.5rem; align-items:center;">
+            <div style="flex:1; min-width:250px;">
+              <p class="mono" style="color:#aaa;font-size:0.8rem;margin-bottom:0.25rem;"><span data-i18n="peak_status">STATUS:</span> Base Camp (Acclimatization)</p>
+              <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:1rem;">
+                <!-- Python/AI item -->
+                <div style="display:flex; align-items:center; justify-content:space-between; background:#111; padding:0.5rem 0.75rem; border-left:2px solid #bd93f9;">
+                  <span class="mono" style="font-size:0.75rem; color:#ccc;">AI / Neural Networks</span>
+                  <span class="mono" style="font-size:0.6rem; color:#bd93f9;">[ACTIVE]</span>
+                </div>
+                <!-- Polish B1 item -->
+                <div style="display:flex; align-items:center; justify-content:space-between; background:#111; padding:0.5rem 0.75rem; border-left:2px solid #23d160;">
+                  <span class="mono" style="font-size:0.75rem; color:#ccc;">Polish: B1 Level</span>
+                  <span class="mono" style="font-size:0.6rem; color:#23d160;">[ACTIVE]</span>
+                </div>
+                <!-- Math item -->
+                <div style="display:flex; align-items:center; justify-content:space-between; background:#111; padding:0.5rem 0.75rem; border-left:2px solid #4488ff;">
+                  <span class="mono" style="font-size:0.75rem; color:#ccc;" data-i18n="skill_math">Higher Math</span>
+                  <span class="mono" style="font-size:0.6rem; color:#888;">[PENDING]</span>
+                </div>
+              </div>
+            </div>
+            <div style="font-family:monospace;font-size:0.65rem;color:#333;white-space:pre;line-height:1.2;text-align:center;flex-shrink:0;margin:0 auto;">
+         /\
+        /  \
+       /    \
+      /      \
+     /        \
+    /   <span style="color:#4488ff;">_</span>      \
+   /   <span style="color:#4488ff;">/ \</span>      \
+  /___<span style="color:#4488ff;">/___\</span>______\
+  <span style="color:#555;">K2 / ANNAPURNA (METAPHORICAL)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ░░ WROCLAW & COUNTDOWN ACCORDION ░░ -->
+      <div class="reveal card" style="transition-delay:0.4s;margin-top:2rem;background:#050505;padding:0;overflow:hidden;">
+        <button class="interactive" onclick="toggleWroclaw()" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:0.75rem;cursor:none;outline:none;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
+            <p class="section-label" style="margin-bottom:0.2rem;">&gt; SYS.NODE // WROCŁAW_DATA</p>
+            <h2 class="section-title" style="margin:0;font-size:1.1rem;"><i data-lucide="satellite" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:0.4rem;"></i>Wrocław Telemetry</h2>
+          </div>
+          <i id="wroclaw-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;"></i>
+        </button>
+        <div id="wroclaw-content" class="accordion-content" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
+          <hr class="divider" />
+          <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2rem;">
+            <div style="width:100%;">
+              <p style="color:#23d160;font-size:0.75rem;margin-bottom:0.5rem;" class="mono">[ T-MINUS TO ACADEMY 2026 ]</p>
+              <div id="countdown-el" style="font-size:1.5rem;font-weight:bold;color:#fff;font-family:monospace;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,255,255,0.2);">--d --h --m --s</div>
+            </div>
+            <div style="width:100%;">
+              <p style="color:#4488ff;font-size:0.75rem;margin-bottom:0.5rem;" class="mono">[ SENSOR DATA: WROCŁAW ]</p>
+              <div class="mono" style="color:#aaa;font-size:0.8rem;line-height:1.6;display:inline-block;text-align:left;">
+                TEMP: 18°C | HUMIDITY: 65% | OVERCAST<br>
+                LOCAL TIME: <span id="wroclaw-time" style="color:#fff;">--:--:--</span><br>
+                PING (TYO): ~142ms<br>
+                PING (NYC): ~95ms<br>
+                PING (LHR): <span style="color:#23d160;">~22ms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- ░░ SOCIALS & NETWORK (ACCORDION) ░░ -->
+    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+      <div class="reveal card" style="transition-delay:0.1s;padding:0;overflow:hidden;background:transparent;border:none;">
+        <button class="interactive" onclick="toggleGeneric('socials-content', 'socials-chevron')" style="width:100%;padding:1.5rem;background:transparent;border:none;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:none;outline:none;position:relative;">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;">
+            <p class="section-label" style="margin-bottom:0.2rem;">&gt; EXT.LINKS // SOCIAL_GRAPH</p>
+            <h2 class="section-title" data-i18n="socials_title" style="margin:0;">Socials & Network</h2>
+          </div>
+          <i id="socials-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:20px;height:20px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;transform:rotate(180deg);"></i>
+        </button>
+        <div id="socials-content" style="max-height:3000px;overflow:hidden;transition:max-height 0.3s ease;">
+          <div style="padding:0 0 1.5rem 0;">
+            <!-- Social cards -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1.25rem;">
+              <a class="social-card interactive" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.75rem;" href="https://t.me/Fog1ch0" target="_blank" rel="noopener">
+                <i data-lucide="send" style="width:22px;height:22px;color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"></i>
+                <div>
+                  <div style="font-weight:600;font-size:0.95rem;margin-bottom:0.2rem;" data-i18n="tg_channel">Telegram Channel</div>
+                  <div class="mono" style="font-size:0.65rem;color:#555;letter-spacing:0.1em;">t.me/Fog1ch0</div>
+                </div>
+              </a>
+              <a class="social-card interactive" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.75rem;" href="https://youtube.com/@Fog1ch" target="_blank" rel="noopener">
+                <i data-lucide="youtube" style="width:22px;height:22px;color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"></i>
+                <div>
+                  <div style="font-weight:600;font-size:0.95rem;margin-bottom:0.2rem;">YouTube</div>
+                  <div class="mono" style="font-size:0.65rem;color:#555;letter-spacing:0.1em;">@Fog1ch</div>
+                </div>
+              </a>
+              <a class="social-card interactive" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.75rem;" href="https://github.com/Fog1ch" target="_blank" rel="noopener">
+                <i data-lucide="github" style="width:22px;height:22px;color:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"></i>
+                <div>
+                  <div style="font-weight:600;font-size:0.95rem;margin-bottom:0.2rem;">GitHub</div>
+                  <div class="mono" style="font-size:0.65rem;color:#555;letter-spacing:0.1em;">github.com/Fog1ch</div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Accordion: Network / Team -->
+            <div class="card" style="overflow:hidden;margin-top:1.5rem;">
+              <button class="interactive" onclick="toggleGeneric('net-content', 'net-chevron')" style="width:100%;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:0.75rem;background:transparent;border:none;cursor:none;text-align:center;position:relative;">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <i data-lucide="network" style="width:16px;height:16px;color:#444;"></i>
+                  <span class="mono" style="font-size:0.75rem;letter-spacing:0.12em;color:#888;" data-i18n="network_label">NETWORK // TEAM</span>
+                </div>
+                <i id="net-chevron" data-lucide="chevron-down" class="accordion-chevron" style="width:16px;height:16px;color:#444;transition:transform 0.3s;position:absolute;right:1.5rem;"></i>
+              </button>
+              <div id="net-content" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
+                <hr class="divider" />
+                <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:0.75rem;text-align:center;">
+                  <!-- Friend card -->
+                  <div class="friend-card" style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;width:100%;max-width:300px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#111;border:1px solid #222;display:flex;align-items:center;justify-content:center;font-size:1rem;">👾</div>
+                    <div>
+                      <div style="font-weight:500;font-size:0.9rem;color:#ccc;margin-bottom:0.2rem;">friend_handle</div>
+                      <div class="mono" style="font-size:0.65rem;color:#444;letter-spacing:0.1em;" data-i18n="friend_role">Developer · Designer</div>
+                    </div>
+                    <a href="#" class="interactive" style="font-size:0.65rem;color:#333;font-family:'JetBrains Mono',monospace;letter-spacing:0.1em;transition:color 0.2s;" onmouseover="this.style.color='#888'" onmouseout="this.style.color='#333'">VISIT →</a>
+                  </div>
+                  <div style="padding:0.75rem;border:1px dashed #1a1a1a;width:100%;max-width:300px;text-align:center;">
+                    <span class="mono" style="font-size:0.65rem;color:#2a2a2a;letter-spacing:0.1em;" data-i18n="team_more">// MORE COMING SOON</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ░░ TERMINAL ░░ -->
+    <section style="max-width:900px;margin:0 auto;padding:1rem 1.5rem 3rem;">
+      <div class="reveal card" style="transition-delay:0.1s;background:#050505;padding:1.25rem 1.5rem;border:1px solid #333;overflow:hidden;">
+        
+        <!-- Sys Info Row -->
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;border-bottom:1px dashed #1a1a1a;padding-bottom:1rem;justify-content:center;">
+          <div style="flex:1;min-width:120px;text-align:center;">
+            <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="map-pin" style="width:10px;height:10px;"></i> LOCATION</div>
+            <div class="mono" style="font-size:0.75rem;color:#888;">POLAND (EU)</div>
+          </div>
+          <div style="flex:1;min-width:120px;text-align:center;">
+            <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="wifi" style="width:10px;height:10px;"></i> PING</div>
+            <div class="mono" style="font-size:0.75rem;color:#23d160;">~14ms</div>
+          </div>
+          <div style="flex:1;min-width:120px;text-align:center;">
+            <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="clock" style="width:10px;height:10px;"></i> SESSION_TIME</div>
+            <div class="mono" id="session-time-el" style="font-size:0.75rem;color:#888;">0s</div>
+          </div>
+          <div style="flex:1;min-width:120px;text-align:center;">
+            <div style="font-size:0.6rem;color:#444;margin-bottom:0.2rem;display:flex;align-items:center;justify-content:center;gap:0.3rem;"><i data-lucide="monitor" style="width:10px;height:10px;"></i> CLIENT</div>
+            <div class="mono" id="client-info-el" style="font-size:0.7rem;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;margin:0 auto;">Detecting...</div>
+          </div>
+        </div>
+        <div id="terminal-output" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.5rem;max-height:300px;overflow-y:auto;padding-right:0.5rem;"></div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <span class="mono" style="font-size:0.85rem;color:#23d160;">fog1ch@sys</span>
+          <span class="mono" style="font-size:0.85rem;color:#ccc;">:</span>
+          <span class="mono" style="font-size:0.85rem;color:#4488ff;">~</span>
+          <span class="mono" style="font-size:0.85rem;color:#ccc;">$</span>
+          <!-- A visual input field -->
+          <input type="text" id="terminal-input" class="mono interactive" 
+                 style="background:transparent;border:none;outline:none;color:#fff;font-size:0.85rem;flex:1;caret-color:#fff;"
+                 placeholder="Type 'help'..." spellcheck="false" autocomplete="off" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░ FOOTER ░░ -->
+    <footer style="max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px solid #1a1a1a;">
+      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:1rem;">
+        <div class="mono" style="font-size:0.62rem;color:#2a2a2a;letter-spacing:0.15em;">
+          © 2026 FOG1CH. // ALL_RIGHTS_RESERVED
+        </div>
+        <div class="mono" style="font-size:0.62rem;color:#2a2a2a;letter-spacing:0.1em;">
+          BUILT_WITH: HTML5 + TAILWIND + VANILLA_JS
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /#main-content -->
+
+  <!-- ░░ CYBER EYE ░░ -->
+  <div id="cyber-eye" style="position:fixed; bottom:2rem; right:2rem; width:48px; height:48px; border:2px solid rgba(50,50,50,0.5); border-radius:50%; z-index:90; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); pointer-events:none;">
+    <div style="position:absolute; top:-5px; bottom:-5px; width:1px; background:rgba(255,255,255,0.1);"></div>
+    <div style="position:absolute; left:-5px; right:-5px; height:1px; background:rgba(255,255,255,0.1);"></div>
+    <div id="cyber-pupil" style="width:10px; height:10px; background:#4488ff; border-radius:50%; box-shadow:0 0 10px #4488ff; position:relative; transition: transform 0.05s linear;"></div>
+  </div>
+
+  <!-- ░░ DECOMPILER MODAL ░░ -->
+  <div id="decompiler-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:9999999; display:none; flex-direction:column; align-items:center; justify-content:center; padding:2rem; opacity:0; transition:opacity 0.3s ease;">
+    <div style="width:100%; max-width:850px; background:#080808; border:1px solid #1a1a1a; border-radius:6px; overflow:hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.9);">
+      <div style="background:#111; border-bottom:1px solid #1a1a1a; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="terminal" style="width:14px; height:14px; color:#4488ff;"></i>
+          <span class="mono" style="color:#888; font-size:0.75rem;">FOG1CH_DECOMPILER_v1.0.exe</span>
+        </div>
+        <button class="interactive" onclick="closeDecompiler()" style="background:transparent; border:none; color:#ff4444; cursor:none; font-family:monospace; font-size:1.1rem; padding:0; line-height:1;">✕</button>
+      </div>
+      <div style="padding:1.5rem; overflow-y:auto; max-height:70vh; font-family:'JetBrains Mono', monospace; font-size:0.85rem; line-height:1.6; color:#ccc;">
+<pre style="margin:0;"><span style="color:#555;">// ==========================================
+// FAKE DECOMPILER OUTPUT
+// AUTHOR: Fog1ch
+// TARGET: main_bio.exe
+// ==========================================</span>
+
+<span style="color:#555;">// TODO: Figure out how to center a div without crying</span>
+<span style="color:#ff79c6;">function</span> <span style="color:#50fa7b;">renderHero</span>() {
+  <span style="color:#ff79c6;">const</span> ego = Math.<span style="color:#8be9fd;">max</span>(<span style="color:#bd93f9;">Infinity</span>, currentEgoLevel);
+  <span style="color:#ff79c6;">return</span> <span style="color:#f1fa8c;">\`&lt;Hero size="\${ego}vw" /&gt;\`</span>;
+}
+
+<span style="color:#555;">// WARNING: Do not touch the timeout below.
+// I don't know why, but removing it breaks the whole Matrix.
+// Seriously, I spent 4 hours debugging this yesterday.</span>
+<span style="color:#8be9fd;">setTimeout</span>(() =&gt; {
+   <span style="color:#50fa7b;">loadSystem</span>();
+}, <span style="color:#bd93f9;">400</span>);
+
+<span style="color:#555;">// 2026 update: Poland arc started.
+// Remember to drink coffee and pretend to know C++</span>
+<span style="color:#ff79c6;">function</span> <span style="color:#50fa7b;">getSleepSchedule</span>() {
+   <span style="color:#ff79c6;">return</span> <span style="color:#bd93f9;">null</span>; <span style="color:#555;">// Error 404: Sleep Not Found</span>
+}
+
+<span style="color:#ff79c6;">function</span> <span style="color:#50fa7b;">processTerminalInput</span>(cmd) {
+   <span style="color:#ff79c6;">if</span> (cmd === <span style="color:#f1fa8c;">"fuck"</span>) {
+      <span style="color:#50fa7b;">executePunishment</span>(); <span style="color:#555;">// lol get rekt</span>
+   }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ================================================================
+     GLOBAL STATE
+  ================================================================ */
+  let currentLang    = 'en';
+  let scWidget       = null;
+  let scPlaying      = false;
+  let lanyardTimer   = null;
+  const LANYARD_ID   = '1058724375970451517';
+
+  /* ================================================================
+     i18n DICTIONARY
+  ================================================================ */
+  const i18n = {
+    en: {
+      hero_bio:        'Software Engineering & AI enthusiast. Building the future from Poland.',
+      tag_poland:      '🇵🇱 Poland',
+      tag_se:          'Software Eng.',
+      tag_ai:          'AI / ML',
+      tracks_title:    'Selected Tracks',
+      hw_title:        'Hardware Setup',
+      hw_model:        'MODEL',
+      connect_title:   'Connect',
+      socials_title:   'Socials & Network',
+      tg_channel:      'Telegram Channel',
+      network_label:   'NETWORK // TEAM',
+      friend_role:     'Developer · Designer',
+      team_more:       '// MORE COMING SOON',
+      status_online:   'ONLINE',
+      status_idle:     'IDLE',
+      status_dnd:      'DO NOT DISTURB',
+      status_offline:  'OFFLINE',
+      lock_prompt:     '[ Click to initialize ]',
+      act_idle:        '&gt; SYS.IDLE // No active tasks',
+      skills_title:    'Tech Matrix',
+      timeline_title:  'Roadmap',
+      skill_math:      'Higher Math',
+      time_1_date:     '2026 / PRESENT',
+      time_1_title:    'Technikum Admission',
+      time_1_desc:     'Enrolled as a Software Engineering Technician with AI focus in Poland.',
+      time_2_date:     '2026 - 2031',
+      time_2_title:    'The 5-Year Grind',
+      time_2_desc:     'Deep dive into code, math, building projects, and surviving the matrix.',
+      time_3_date:     '2031+',
+      time_3_title:    'Higher Education',
+      time_3_desc:     'Going for a university degree to level up the core fundamentals.',
+      time_4_date:     'FUTURE',
+      time_4_title:    'Graduation & Career',
+      time_4_desc:     'Becoming a full-time Senior AI/Software Engineer. The real game begins.',
+      peak_title:      'Expedition: AI & Core',
+      peak_status:     'STATUS:',
+      peak_item1:      'AI: Studying Neural Networks & Core ML',
+      peak_item2:      'Language: Polish B1 Level',
+      peak_item3:      'Math: Advancing in Higher Math (Calculus)',
+    },
+    ru: {
+      hero_bio:        'Разработчик ПО и энтузиаст ИИ. Строю будущее из Польши.',
+      tag_poland:      '🇵🇱 Польша',
+      tag_se:          'Разработка ПО',
+      tag_ai:          'ИИ / МО',
+      tracks_title:    'Избранные треки',
+      hw_title:        'Железо / Сетап',
+      hw_model:        'МОДЕЛЬ',
+      connect_title:   'Связаться',
+      socials_title:   'Соцсети и сеть',
+      tg_channel:      'Telegram-канал',
+      network_label:   'СЕТЬ // КОМАНДА',
+      friend_role:     'Разработчик · Дизайнер',
+      team_more:       '// СКОРО БОЛЬШЕ',
+      status_online:   'В СЕТИ',
+      status_idle:     'ОТОШЁЛ',
+      status_dnd:      'НЕ БЕСПОКОИТЬ',
+      status_offline:  'ОФЛАЙН',
+      lock_prompt:     '[ Нажмите для запуска ]',
+      act_idle:        '&gt; SYS.IDLE // Нет активных задач',
+      skills_title:    'Матрица навыков',
+      timeline_title:  'Таймлайн / Цели',
+      skill_math:      'Высшая математика',
+      time_1_date:     '2026 / ТЕКУЩЕЕ',
+      time_1_title:    'Поступление в Техникум',
+      time_1_desc:     'Начал обучение на техника-программиста с уклоном в ИИ в Польше.',
+      time_2_date:     '2026 - 2031',
+      time_2_title:    '5 Лет Обучения',
+      time_2_desc:     'Глубокое погружение в код, создание проектов и выживание в матрице.',
+      time_3_date:     '2031+',
+      time_3_title:    'Высшее образование',
+      time_3_desc:     'Поступление в университет для прокачки фундаментальных знаний.',
+      time_4_date:     'БУДУЩЕЕ',
+      time_4_title:    'Выпуск и Карьера',
+      time_4_desc:     'Становление Senior AI/Software инженером. Начало настоящей игры.',
+      peak_title:      'Экспедиция: ИИ и Фундаментал',
+      peak_status:     'СТАТУС:',
+      peak_item1:      'AI: Изучаю нейронные сети и Core ML',
+      peak_item2:      'Язык: Польский (уровень B1)',
+      peak_item3:      'Математика: Продвигаюсь в высшей математике',
+    }
+  };
+
+  function t(key) {
+    return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.en[key] || key);
+  }
+
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.placeholder = t(key);
+      } else {
+          el.innerHTML = t(key);
+      }
+    });
+    document.getElementById('hero-bio').textContent = t('hero_bio');
+    document.getElementById('lock-prompt').textContent = t('lock_prompt');
+    renderLanyardActivity(window._lastLanyardData || null);
+  }
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+    applyI18n();
+  }
+
+  /* ================================================================
+     LIVE CLOCK & SYS INFO
+  ================================================================ */
+  const sessionStart = Date.now();
+  const targetDate = new Date('2026-09-01T08:00:00').getTime();
+
+  function updateClock() {
+    const now = new Date();
+    const opts = { timeZone: 'Europe/Warsaw', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    const parts = new Intl.DateTimeFormat('en-GB', opts).formatToParts(now);
+    const h = parts.find(p=>p.type==='hour').value;
+    const m = parts.find(p=>p.type==='minute').value;
+    const s = parts.find(p=>p.type==='second').value;
+    
+    const timeString = `${h}<span style="animation:blink-anim 1s infinite;">:</span>${m}<span style="animation:blink-anim 1s infinite;">:</span>${s}`;
+    
+    const clockEl = document.getElementById('live-clock');
+    if (clockEl) clockEl.innerHTML = timeString + ' WAW';
+
+    const wroclawEl = document.getElementById('wroclaw-time');
+    if (wroclawEl) wroclawEl.innerHTML = timeString;
+
+    // Session time
+    const sessionEl = document.getElementById('session-time-el');
+    if (sessionEl) {
+      const diff = Math.floor((Date.now() - sessionStart) / 1000);
+      sessionEl.textContent = diff + 's';
+    }
+
+    // Countdown logic
+    const countdownEl = document.getElementById('countdown-el');
+    if (countdownEl) {
+      const distance = targetDate - now.getTime();
+      if (distance < 0) {
+        countdownEl.textContent = "ACADEMY STARTED";
+      } else {
+        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hrs = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((distance % (1000 * 60)) / 1000);
+        countdownEl.textContent = `${d}d ${hrs.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+      }
+    }
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Set Client Info
+  window.addEventListener('DOMContentLoaded', () => {
+    const clientEl = document.getElementById('client-info-el');
+    if (clientEl) {
+      const ua = navigator.userAgent;
+      let browser = "Unknown";
+      if (ua.includes("Chrome")) browser = "Chrome";
+      else if (ua.includes("Firefox")) browser = "Firefox";
+      else if (ua.includes("Safari")) browser = "Safari";
+      
+      let os = "Unknown";
+      if (ua.includes("Win")) os = "Windows";
+      else if (ua.includes("Mac")) os = "MacOS";
+      else if (ua.includes("Linux")) os = "Linux";
+      else if (ua.includes("Android")) os = "Android";
+      else if (ua.includes("like Mac")) os = "iOS";
+
+      clientEl.textContent = `${browser} / ${os}`;
+    }
+  });
+
+  /* ================================================================
+     AUDIO SFX
+  ================================================================ */
+  let audioCtx;
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  function playTick() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.03);
+    gainNode.gain.setValueAtTime(0.015, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.03);
+  }
+
+  /* ================================================================
+     LOCK SCREEN
+  ================================================================ */
+  const lockScreen = document.getElementById('lock-screen');
+  const mainContent = document.getElementById('main-content');
+
+  lockScreen.addEventListener('click', unlockSite);
+
+  let isUnlocking = false;
+  function unlockSite() {
+    if (isUnlocking) return;
+    isUnlocking = true;
+    initAudio();
+
+    // Hide original lock content
+    document.getElementById('lock-title').style.display = 'none';
+    document.getElementById('lock-prompt').style.display = 'none';
+    
+    // Setup BIOS screen
+    lockScreen.style.justifyContent = 'flex-start';
+    lockScreen.style.alignItems = 'flex-start';
+    lockScreen.style.padding = '2rem';
+    lockScreen.style.textAlign = 'left';
+    lockScreen.style.cursor = 'wait';
+    lockScreen.innerHTML = '';
+
+    const lines = [
+      "FOG_OS(tm) BIOS Version 2.6.0",
+      "Copyright (C) 2026, Fog1ch Corporation",
+      "&nbsp;",
+      "Main Processor: AMD Ryzen 7 5800H with Radeon Graphics",
+      "Memory Testing: 16384M OK",
+      "&nbsp;",
+      "Detecting Primary Master... 3TB NVMe SSD",
+      "Detecting Primary Slave... None",
+      "&nbsp;",
+      "Initializing USB Controllers... Done.",
+      "System Boot Sequence Initiated...",
+      "Loading kernel modules.................... [OK]",
+      "Mounting root filesystem.................. [OK]",
+      "Starting visual interface................."
+    ];
+
+    let delay = 0;
+    lines.forEach((line, i) => {
+      setTimeout(() => {
+        if (line !== "&nbsp;") playTick();
+        lockScreen.innerHTML += `<div style="font-family:'JetBrains Mono',monospace;color:#ccc;font-size:0.85rem;margin-bottom:0.2rem;text-shadow:none;">${line}</div>`;
+      }, delay);
+      delay += Math.random() * 150 + 50;
+      if (i === 4 || i === 9) delay += 400; // Fake pause
+    });
+
+    setTimeout(() => {
+      lockScreen.classList.add('dismissed');
+      document.body.classList.remove('locked');
+      mainContent.style.opacity = '1';
+      document.getElementById('music-controls').classList.add('visible');
+
+      // Robust music start logic
+      if (scWidget) {
+        let playAttempts = 0;
+        const tryPlay = () => {
+          scWidget.play();
+          scWidget.isPaused((paused) => {
+            if (!paused) {
+              scPlaying = true;
+              document.getElementById('btn-play-pause').textContent = '⏸ PAUSE';
+            } else if (playAttempts < 10) {
+              playAttempts++;
+              setTimeout(tryPlay, 300);
+            }
+          });
+        };
+        tryPlay();
+      }
+      // Trigger typing effect
+      setTimeout(startTyping, 400);
+    }, delay + 600);
+  }
+
+  /* ================================================================
+     SOUNDCLOUD WIDGET API
+  ================================================================ */
+  const playlistTracks = [
+    { url: 'https://soundcloud.com/nid_1/pharaoh-black-siemens-slow-version-remix-by-nid', title: 'Pharaoh — Black Siemens' },
+    { url: 'https://soundcloud.com/stef-b3d/medasin-magic-slideshow', title: 'Medasin — Magic Slideshow' }
+  ];
+  let currentTrackIdx = 0;
+
+  function updateNowPlayingUI() {
+    const box = document.getElementById('now-playing-box');
+    const text = document.getElementById('now-playing-text');
+    if (box && text) {
+      text.textContent = playlistTracks[currentTrackIdx].title;
+      box.style.opacity = '1';
+    }
+  }
+
+  window.addEventListener('load', () => {
+    const iframe = document.getElementById('sc-iframe-hidden');
+    const volSlider = document.getElementById('volume-slider');
+    
+    if (typeof SC !== 'undefined') {
+      scWidget = SC.Widget(iframe);
+      
+      if (volSlider) {
+        volSlider.addEventListener('input', (e) => {
+          if (scWidget) scWidget.setVolume(e.target.value);
+        });
+      }
+
+      scWidget.bind(SC.Widget.Events.READY, () => {
+        if (volSlider) scWidget.setVolume(volSlider.value);
+      });
+      scWidget.bind(SC.Widget.Events.PLAY, () => {
+        scPlaying = true;
+        document.getElementById('btn-play-pause').textContent = '⏸ PAUSE';
+        updateNowPlayingUI();
+      });
+      scWidget.bind(SC.Widget.Events.PAUSE, () => {
+        scPlaying = false;
+        document.getElementById('btn-play-pause').textContent = '▶ PLAY';
+      });
+      scWidget.bind(SC.Widget.Events.FINISH, () => {
+        nextTrack();
+      });
+    }
+  });
+
+  function togglePlayPause() {
+    if (!scWidget) return;
+    scWidget.toggle();
+  }
+
+  function nextTrack() {
+    if (!scWidget) return;
+    currentTrackIdx = (currentTrackIdx + 1) % playlistTracks.length;
+    scWidget.load(playlistTracks[currentTrackIdx].url, {
+      auto_play: true,
+      color: '%23ffffff',
+      hide_related: true,
+      show_comments: false,
+      show_user: true,
+      show_reposts: false,
+      show_teaser: false,
+      visual: false
+    });
+  }
+
+  /* ================================================================
+     TYPING EFFECT
+  ================================================================ */
+  const FULL_TEXT = 'Fog1ch.';
+  let typingDone  = false;
+
+  function startTyping() {
+    if (typingDone) return;
+    const el = document.getElementById('typing-text');
+    let i = 0;
+    el.textContent = '';
+    const iv = setInterval(() => {
+      el.textContent += FULL_TEXT[i];
+      i++;
+      if (i >= FULL_TEXT.length) {
+        clearInterval(iv);
+        typingDone = true;
+        el.classList.add('done');
+      }
+    }, 100);
+  }
+
+  /* ================================================================
+     LANYARD API
+  ================================================================ */
+  window._lastLanyardData = null;
+
+  function fetchLanyard() {
+    fetch(`https://api.lanyard.rest/v1/users/${LANYARD_ID}`)
+      .then(r => r.json())
+      .then(json => {
+        if (!json.success) return;
+        window._lastLanyardData = json.data;
+        renderLanyardActivity(json.data);
+      })
+      .catch(() => {/* silent fail */});
+  }
+
+  function renderLanyardActivity(data) {
+    const actEl    = document.getElementById('presence-activity');
+    const dotEl    = document.getElementById('presence-status-dot');
+    const statEl   = document.getElementById('presence-status-text');
+    const custEl   = document.getElementById('presence-custom-status');
+
+    if (!data) {
+      actEl.innerHTML = t('act_idle');
+      return;
+    }
+
+    // Status dot
+    const statusMap = { 0: ['dot-online', 'status_online'], 1: ['dot-idle', 'status_idle'], 2: ['dot-dnd', 'status_dnd'], 3: ['dot-offline', 'status_offline'] };
+    const sInfo = statusMap[data.discord_status === 'online' ? 0 : data.discord_status === 'idle' ? 1 : data.discord_status === 'dnd' ? 2 : 3] || statusMap[3];
+    dotEl.className = `status-dot ${sInfo[0]}`;
+    statEl.textContent = t(sInfo[1]);
+
+    // Custom status
+    if (data.activities) {
+      const custom = data.activities.find(a => a.type === 4);
+      if (custom) {
+        const emoji = custom.emoji ? (custom.emoji.name || '') : '';
+        custEl.textContent = `${emoji} ${custom.state || ''}`.trim();
+      } else {
+        custEl.textContent = '';
+      }
+    }
+
+    // Activity
+    if (!data.activities || data.activities.length === 0) {
+      actEl.innerHTML = t('act_idle');
+      return;
+    }
+
+    // Spotify
+    if (data.listening_to_spotify && data.spotify) {
+      const sp = data.spotify;
+      actEl.innerHTML =
+        `<span style="color:#1db954;">▶ SPOTIFY</span>` +
+        ` // <span style="color:#ccc;">${escHtml(sp.song)}</span>` +
+        ` <span style="color:#555;">by</span> <span style="color:#888;">${escHtml(sp.artist)}</span>`;
+      return;
+    }
+
+    // Other activities (game, VS Code, etc.)
+    const relevant = data.activities.filter(a => a.type !== 4);
+    if (relevant.length > 0) {
+      const act = relevant[0];
+      const lines = [];
+      lines.push(`<span style="color:#888;">&gt; APP</span> <span style="color:#ccc;">${escHtml(act.name)}</span>`);
+      if (act.details) lines.push(`<span style="color:#555;">  details: ${escHtml(act.details)}</span>`);
+      if (act.state)   lines.push(`<span style="color:#555;">  state:   ${escHtml(act.state)}</span>`);
+      actEl.innerHTML = lines.join('<br>');
+      return;
+    }
+
+    actEl.innerHTML = t('act_idle');
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Start polling immediately, then every 15s
+  fetchLanyard();
+  setInterval(fetchLanyard, 15000);
+
+  /* ================================================================
+     CUSTOM CURSOR & GLOBAL MOUSE
+  ================================================================ */
+  const cursorDot  = document.getElementById('cursor-dot');
+  const cursorRing = document.getElementById('cursor-ring');
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    window.globalMouseX = mouseX;
+    window.globalMouseY = mouseY;
+    
+    // For ASCII parallax
+    const mx = (mouseX / window.innerWidth) * 2 - 1;
+    const my = (mouseY / window.innerHeight) * 2 - 1;
+    document.documentElement.style.setProperty('--mx', mx);
+    document.documentElement.style.setProperty('--my', my);
+
+    // Translate with GPU acceleration
+    cursorDot.style.transform  = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    cursorRing.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+
+    // Cyber eye logic
+    const eye = document.getElementById('cyber-eye');
+    const pupil = document.getElementById('cyber-pupil');
+    if (eye && pupil) {
+      const rect = eye.getBoundingClientRect();
+      const ex = rect.left + rect.width / 2;
+      const ey = rect.top + rect.height / 2;
+      const rad = Math.atan2(mouseY - ey, mouseX - ex);
+      // Max distance to keep pupil inside eye
+      const maxDist = 14; 
+      const dist = Math.min(maxDist, Math.hypot(mouseX - ex, mouseY - ey) * 0.05);
+      pupil.style.transform = `translate(${Math.cos(rad) * dist}px, ${Math.sin(rad) * dist}px)`;
+    }
+  });
+
+  /* ================================================================
+     DECOMPILER MODAL
+  ================================================================ */
+  function openDecompiler() {
+    const modal = document.getElementById('decompiler-modal');
+    modal.style.display = 'flex';
+    // Trigger reflow to apply transition
+    void modal.offsetWidth;
+    modal.style.opacity = '1';
+  }
+  function closeDecompiler() {
+    const modal = document.getElementById('decompiler-modal');
+    modal.style.opacity = '0';
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
+  }
+
+  // Hover on interactive elements
+  function onInteractiveEnter() {
+    cursorDot.classList.add('hovered');
+    cursorRing.classList.add('hovered');
+  }
+  function onInteractiveLeave() {
+    cursorDot.classList.remove('hovered');
+    cursorRing.classList.remove('hovered');
+  }
+
+  function attachCursorListeners() {
+    document.querySelectorAll('.interactive, a, button, [onclick], input').forEach(el => {
+      el.removeEventListener('mouseenter', onInteractiveEnter);
+      el.removeEventListener('mouseleave', onInteractiveLeave);
+      el.removeEventListener('mouseenter', playTick);
+      el.addEventListener('mouseenter', onInteractiveEnter);
+      el.addEventListener('mouseleave', onInteractiveLeave);
+      el.addEventListener('mouseenter', playTick);
+    });
+
+    const termInput = document.getElementById('terminal-input');
+    if (termInput) {
+      termInput.removeEventListener('input', playTick);
+      termInput.addEventListener('input', playTick);
+    }
+  }
+
+  /* ================================================================
+     MAGNETIC BUTTONS
+  ================================================================ */
+  function attachMagnetic() {
+    document.querySelectorAll('.magnetic').forEach(el => {
+      el.addEventListener('mousemove', function(e) {
+        const rect = el.getBoundingClientRect();
+        const cx   = rect.left + rect.width  / 2;
+        const cy   = rect.top  + rect.height / 2;
+        const dx   = (e.clientX - cx) * 0.22;
+        const dy   = (e.clientY - cy) * 0.22;
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+      el.addEventListener('mouseleave', function() {
+        el.style.transform = 'translate(0,0)';
+      });
+    });
+  }
+
+  /* ================================================================
+     SCROLL REVEAL & SKEW & VISUALIZER LOOP
+  ================================================================ */
+  const reveals = document.querySelectorAll('.reveal');
+  let currentScroll = window.scrollY;
+  let currentSkew = 0;
+
+  // Background visualizer variables
+  const bgCanvas = document.getElementById('bg-visualizer');
+  const bgCtx = bgCanvas.getContext('2d');
+  let bgTime = 0;
+  let bgCurrentAmp = 10;
+  function resizeCanvas() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function renderLoop() {
+    // Reveal
+    const winH = window.innerHeight;
+    reveals.forEach(el => {
+      const top = el.getBoundingClientRect().top;
+      if (top < winH - 40) el.classList.add('visible');
+    });
+
+    // Skew Effect
+    const targetScroll = window.scrollY;
+    const scrollDelta = targetScroll - currentScroll;
+    currentScroll = targetScroll;
+    
+    // Smooth skew based on scroll velocity
+    let targetSkew = scrollDelta * 0.05;
+    targetSkew = Math.max(-4, Math.min(4, targetSkew)); // Clamp between -4 and 4 degrees
+    currentSkew += (targetSkew - currentSkew) * 0.1;
+    
+    if (Math.abs(currentSkew) > 0.01 || Math.abs(scrollDelta) > 0) {
+      if (mainContent && mainContent.style.opacity === '1') {
+        mainContent.style.transform = `skewY(${currentSkew}deg)`;
+      }
+    } else {
+      if (mainContent && mainContent.style.opacity === '1') {
+        mainContent.style.transform = `skewY(0deg)`;
+      }
+    }
+
+    // Oscilloscope (Visualizer)
+    if (bgCtx) {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      
+      let targetAmp = (typeof scPlaying !== 'undefined' && scPlaying) ? 50 + Math.random()*20 : 15;
+      
+      // Mouse influence
+      let mx = window.globalMouseX || bgCanvas.width/2;
+      let my = window.globalMouseY || bgCanvas.height/2;
+      let dist = Math.hypot(mx - bgCanvas.width/2, my - bgCanvas.height/2);
+      targetAmp += Math.min(100, dist * 0.05);
+
+      bgCurrentAmp += (targetAmp - bgCurrentAmp) * 0.05;
+      bgTime += (typeof scPlaying !== 'undefined' && scPlaying) ? 0.05 : 0.02;
+
+      bgCtx.lineWidth = 1.5;
+      for (let i = 0; i < 3; i++) {
+        bgCtx.beginPath();
+        let color = (typeof isEmergencyMode !== 'undefined' && isEmergencyMode) ? `rgba(0, 0, 0, ${0.1 + i*0.05})` : `rgba(68, 136, 255, ${0.1 + i*0.05})`;
+        bgCtx.strokeStyle = color;
+        for (let x = 0; x < bgCanvas.width; x += 10) {
+          let y = bgCanvas.height/2 + Math.sin(x*0.01 + bgTime + i) * bgCurrentAmp * Math.sin(x*0.002);
+          if (x === 0) bgCtx.moveTo(x, y);
+          else bgCtx.lineTo(x, y);
+        }
+        bgCtx.stroke();
+      }
+    }
+
+    requestAnimationFrame(renderLoop);
+  }
+  requestAnimationFrame(renderLoop);
+
+  /* ================================================================
+     ACCORDION & WROCLAW
+  ================================================================ */
+  function toggleGeneric(contentId, chevronId) {
+    const content = document.getElementById(contentId);
+    const chevron = document.getElementById(chevronId);
+    if (!content) return;
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+      content.style.maxHeight = '0px';
+      if(chevron) chevron.style.transform = 'rotate(0deg)';
+    } else {
+      content.style.maxHeight = '3000px';
+      if(chevron) chevron.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  function toggleWroclaw() {
+    toggleGeneric('wroclaw-content', 'wroclaw-chevron');
+  }
+  /* ================================================================
+     TOAST / COPY
+  ================================================================ */
+  let toastTimer = null;
+
+  function copyText(text, label) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(`COPIED: ${label.toUpperCase()} // ${text}`);
+    }).catch(() => {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity  = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast(`COPIED: ${label.toUpperCase()} // ${text}`);
+    });
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  function triggerGlitchError() {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '999999';
+    overlay.style.backgroundColor = '#000';
+    overlay.style.color = '#23d160';
+    overlay.style.fontFamily = "'JetBrains Mono', monospace";
+    overlay.style.fontSize = '1.2rem';
+    overlay.style.overflow = 'hidden';
+    overlay.style.padding = '2rem';
+    overlay.style.lineHeight = '1.2';
+    overlay.style.wordBreak = 'break-all';
+    document.body.appendChild(overlay);
+
+    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+    let interval = setInterval(() => {
+      let str = '';
+      for(let i=0; i<1500; i++) str += chars[Math.floor(Math.random() * chars.length)];
+      overlay.textContent = str;
+    }, 50);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.fontSize = '4rem';
+      overlay.style.fontWeight = 'bold';
+      overlay.style.color = '#ff4444';
+      overlay.style.textAlign = 'center';
+      overlay.style.textShadow = '0 0 20px rgba(255,0,0,0.8)';
+      overlay.textContent = currentLang === 'ru' ? 'ТЫ ЧТО, НЕ УМЕЕШЬ ПИСАТЬ?!' : "CAN'T YOU TYPE?!";
+      
+      setTimeout(() => {
+        if (document.body.contains(overlay)) document.body.removeChild(overlay);
+      }, 3000);
+    }, 1500);
+  }
+
+  function triggerMatrixRain() {
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.inset = '0';
+    canvas.style.zIndex = '999999';
+    canvas.style.backgroundColor = '#000';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロゴゾドボポヴッン0123456789';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    for(let x = 0; x < columns; x++) drops[x] = 1;
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0F0';
+      ctx.font = fontSize + 'px monospace';
+      for(let i = 0; i < drops.length; i++) {
+        const text = katakana.charAt(Math.floor(Math.random() * katakana.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    };
+    const interval = setInterval(draw, 33);
+    
+    // Stop after 10 seconds or on click
+    const endMatrix = () => {
+      clearInterval(interval);
+      if (document.body.contains(canvas)) document.body.removeChild(canvas);
+      canvas.removeEventListener('click', endMatrix);
+    };
+    canvas.addEventListener('click', endMatrix);
+    setTimeout(endMatrix, 10000);
+  }
+
+  function triggerPanicCrash() {
+    // harsh glitch sound
+    if (audioCtx) {
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+      gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.5);
+    }
+
+    const panic = document.createElement('div');
+    panic.style.position = 'fixed';
+    panic.style.inset = '0';
+    panic.style.zIndex = '9999999';
+    panic.style.backgroundColor = '#aa0000';
+    panic.style.color = '#fff';
+    panic.style.fontFamily = "'JetBrains Mono', monospace";
+    panic.style.padding = '2rem';
+    panic.style.fontSize = '1.2rem';
+    panic.style.whiteSpace = 'pre-wrap';
+    panic.textContent = `KERNEL PANIC - NOT SYNCING: FATAL EXCEPTION
+    
+Call Trace:
+[<ffffffff8105c31f>] warn_slowpath_common+0x7f/0xc0
+[<ffffffff8105c37a>] warn_slowpath_null+0x1a/0x20
+[<ffffffff814c46f3>] crash_kexec+0xd3/0xe0
+[<ffffffff8105e94b>] oops_end+0xab/0x100
+[<ffffffff8101683b>] die+0x5b/0x90
+[<ffffffff8101438a>] do_trap+0x8a/0x140
+[<ffffffff81014665>] do_invalid_op+0x95/0xa0
+
+System halting...`;
+
+    document.body.appendChild(panic);
+
+    setTimeout(() => {
+      panic.style.backgroundColor = '#000';
+      panic.textContent = '';
+      
+      // reboot beep
+      if (audioCtx) {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+
+      setTimeout(() => {
+        if (document.body.contains(panic)) document.body.removeChild(panic);
+      }, 500);
+    }, 2500);
+  }
+
+  /* ================================================================
+     EASTER EGG (SCREAMER)
+  ================================================================ */
+  function triggerScreamer() {
+    const screamer = document.createElement('div');
+    screamer.style.position = 'fixed';
+    screamer.style.inset = '0';
+    screamer.style.zIndex = '9999999';
+    screamer.style.backgroundColor = '#000';
+    screamer.style.display = 'flex';
+    screamer.style.alignItems = 'center';
+    screamer.style.justifyContent = 'center';
+    screamer.innerHTML = `<img src="https://media.giphy.com/media/xT9IgvEOwRzUcZDRiU/giphy.gif" style="width:100%;height:100%;object-fit:cover;filter:contrast(1.5) saturate(1.5);" alt="Screamer">
+                          <audio autoplay><source src="https://www.myinstants.com/media/sounds/fnaf-jumpscare-sound.mp3" type="audio/mpeg"></audio>`;
+    document.body.appendChild(screamer);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      if (document.body.contains(screamer)) {
+        document.body.removeChild(screamer);
+      }
+    }, 3000);
+  }
+
+  /* ================================================================
+     JUDGMENT OVERLAY
+  ================================================================ */
+  function triggerJudgmentOverlay() {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '9999999';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
+    overlay.style.backdropFilter = 'blur(10px)';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.padding = '2rem';
+    overlay.style.textAlign = 'center';
+    
+    // Add close button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '2rem';
+    closeBtn.style.right = '2rem';
+    closeBtn.style.background = 'transparent';
+    closeBtn.style.border = 'none';
+    closeBtn.style.color = '#888';
+    closeBtn.style.fontSize = '1.5rem';
+    closeBtn.style.cursor = 'none';
+    closeBtn.className = 'interactive';
+    closeBtn.onclick = () => {
+      if (document.body.contains(overlay)) document.body.removeChild(overlay);
+    };
+    overlay.appendChild(closeBtn);
+
+    const textWrap = document.createElement('div');
+    textWrap.style.maxWidth = '600px';
+
+    const p1 = document.createElement('p');
+    p1.style.fontFamily = "'JetBrains Mono', monospace";
+    p1.style.color = '#fff';
+    p1.style.fontSize = '1.1rem';
+    p1.style.lineHeight = '1.6';
+    p1.style.marginBottom = '2rem';
+    p1.innerHTML = currentLang === 'ru' 
+      ? 'Глобальный суд — это не ядерная катастрофа, а прямое вмешательство Бога, в результате которого будет уничтожен весь существующий злой мир.'
+      : 'Global judgment is not a nuclear disaster, but direct intervention from God resulting in the destruction of the current wicked world.';
+    textWrap.appendChild(p1);
+
+    const btn = document.createElement('button');
+    btn.className = 'interactive magnetic';
+    btn.style.background = '#111';
+    btn.style.border = '1px solid #333';
+    btn.style.color = '#ccc';
+    btn.style.padding = '0.75rem 1.5rem';
+    btn.style.fontFamily = "'JetBrains Mono', monospace";
+    btn.style.fontSize = '0.85rem';
+    btn.style.cursor = 'none';
+    btn.textContent = currentLang === 'ru' ? 'А когда будет суд?' : 'When will the judgment happen?';
+    
+    const ansP = document.createElement('p');
+    ansP.style.fontFamily = "'JetBrains Mono', monospace";
+    ansP.style.color = '#ff4444';
+    ansP.style.fontSize = '1.2rem';
+    ansP.style.marginTop = '2rem';
+    ansP.style.opacity = '0';
+    ansP.style.transition = 'opacity 0.5s ease';
+    ansP.innerHTML = currentLang === 'ru' ? 'idk bro 😂<br><br><span style="font-size:0.8rem;color:#888;">я не бог чтобы знать это</span>' : 'idk bro 😂<br><br><span style="font-size:0.8rem;color:#888;">im not god to know that</span>';
+
+    btn.onclick = () => {
+      btn.style.display = 'none';
+      textWrap.appendChild(ansP);
+      setTimeout(() => { ansP.style.opacity = '1'; }, 50);
+    };
+
+    textWrap.appendChild(btn);
+    overlay.appendChild(textWrap);
+    document.body.appendChild(overlay);
+
+    // Reattach listeners to newly created interactive elements
+    attachCursorListeners();
+    attachMagnetic();
+  }
+
+  /* ================================================================
+     INIT
+  ================================================================ */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Apply default language
+    applyI18n();
+
+    // Attach listeners
+    attachCursorListeners();
+    attachMagnetic();
+
+    // Terminal Logic
+    const termInput = document.getElementById('terminal-input');
+    const termOutput = document.getElementById('terminal-output');
+    let cmdHistory = [];
+    let historyIdx = -1;
+    let tempCmd = '';
+
+    if (termInput) {
+      termInput.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (historyIdx === -1) tempCmd = this.value;
+          if (historyIdx < cmdHistory.length - 1) {
+            historyIdx++;
+            this.value = cmdHistory[historyIdx];
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (historyIdx > 0) {
+            historyIdx--;
+            this.value = cmdHistory[historyIdx];
+          } else if (historyIdx === 0) {
+            historyIdx = -1;
+            this.value = tempCmd;
+          }
+        } else if (e.key === 'Enter') {
+          const val = this.value.trim();
+          this.value = '';
+          if (!val) return;
+          
+          if (cmdHistory[0] !== val) {
+            cmdHistory.unshift(val);
+            if (cmdHistory.length > 50) cmdHistory.pop();
+          }
+          historyIdx = -1;
+          tempCmd = '';
+          
+          let response = '';
+          let ignoreAppend = false;
+          const cmd = val.toLowerCase();
+          if (cmd === 'help') {
+            response = 'Available commands: help, clear, whoami, ping, date, matrix, portrait';
+          } else if (cmd === 'clear') {
+            termOutput.innerHTML = '';
+            return;
+          } else if (cmd === 'whoami') {
+            response = 'fog1ch - Software Engineering & AI enthusiast';
+          } else if (cmd === 'ping') {
+            response = 'pong! (0ms)';
+          } else if (cmd === 'date') {
+            response = new Date().toString();
+          } else if (cmd === 'matrix') {
+            response = 'Wake up, Neo...';
+            setTimeout(triggerMatrixRain, 500);
+          } else if (cmd === 'panic') {
+            response = 'KERNEL PANIC INITIATED...';
+            setTimeout(triggerPanicCrash, 500);
+          } else if (cmd === '2019 russia') {
+            response = 'SYSTEM FAILURE...';
+            setTimeout(triggerScreamer, 500);
+          } else if (cmd === 'jw') {
+            response = 'Redirecting to jw.org...';
+            setTimeout(() => {
+              window.location.href = currentLang === 'ru' 
+                ? 'https://www.jw.org/ru/библиотека/книги/Понимание-Писания/Деньги/' 
+                : 'https://www.jw.org/en/library/books/Insight-on-the-Scriptures/Money/';
+            }, 500);
+          } else if (cmd === 'portrait') {
+            const art = `MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMWXKNMMMMMMMMMMM
+MMMMMMMMMMMMMW0o'.c0WMMMMMMMMM
+MMMMMMMMMMMMNx,    .oXMMMMMMMM
+MMMMMMMMMMMWO;        ,OWMMMMM
+MMMMMMMMMMMXl.          .oXMMM
+MMMMMMMMMMK:     .';;;'.  :KMM
+MMMMMMMMMWd.   .xXWMMMWKo..dWM
+MMMMMMMMMK,   .dWMMMMMMMWk.,KM
+MMMMMMMMWd.   :XMMMMMMMMMWo.dW
+MMMMMMMMX:   .dWMMMMMMMMMWd.:X
+MMMMMMMMK,   .kMMMMMMMMMMWk.,K
+MMMMMMMMNc   .oWMMMMMMMMMWo.cN
+MMMMMMMMWx.   .oKWMMMMMNOc..dW
+MMMMMMMMMNl.    .,clllc'.  .lX
+MMMMMMMMMMXo.              .oX
+MMMMMMMMMMMWk'            'kWM
+MMMMMMMMMMMMW0l.        .l0WMM
+MMMMMMMMMMMMMMWKd;.  .;dKWMMMM
+MMMMMMMMMMMMMMMMMWXOOKWMMMMMMM`;
+            response = `<br><div class="ascii-art" style="font-size:0.45rem;line-height:0.45rem;color:#ccc;white-space:pre;font-weight:bold;">${art}</div><br>`;
+          } else {
+            // Bad words check
+            const badWords = ['nigger', 'nigga', 'fuck', 'shit', 'bitch', 'asshole', 'cunt', 'dick', 'pussy', 'whore', 'slut', 'faggot', 'retard', 'kurwa', 'бля', 'сука', 'пиздец', 'ебать', 'хуй', 'пидор', 'гандон', 'шлюха'];
+            const isBadWord = badWords.some(bw => cmd.includes(bw));
+            
+            if (isBadWord) {
+              ignoreAppend = true;
+              triggerGlitchError();
+            } else {
+              response = `Command not found: ${val}. Type 'help' for available commands.`;
+            }
+          }
+
+          if (!ignoreAppend) {
+            const cmdLine = document.createElement('div');
+            cmdLine.className = 'mono';
+            cmdLine.style.fontSize = '0.85rem';
+            cmdLine.innerHTML = `<span style="color:#23d160;">fog1ch@sys</span><span style="color:#ccc;">:</span><span style="color:#4488ff;">~</span><span style="color:#ccc;">$</span> <span style="color:#fff;">${val}</span>`;
+            
+            const resLine = document.createElement('div');
+            resLine.className = 'mono';
+            resLine.style.fontSize = '0.85rem';
+            resLine.style.color = '#aaa';
+            resLine.innerHTML = response;
+            
+            termOutput.appendChild(cmdLine);
+            termOutput.appendChild(resLine);
+            termOutput.scrollTop = termOutput.scrollHeight;
+          }
+        }
+      });
+    }
+
+    // Re-attach after icons render (short delay just in case)
+    setTimeout(() => {
+      attachCursorListeners();
+      attachMagnetic();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  });
+  </script>
+
+</body>
+</html>
