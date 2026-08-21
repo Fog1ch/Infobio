@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fog1ch — Final Version</title>
+  <title>Bio Fog1ch</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -142,19 +142,36 @@
     
     @keyframes pulse-border { 0%, 100% { border-color: #292d30; } 50% { border-color: #9281f7; } }
     .anim-border { animation: pulse-border 4s infinite; }
+  
+    .magnetic { transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, color 0.3s, background-color 0.3s; }
+  
+  
+    .tilt-card { transition: transform 0.1s ease-out, border-color 0.3s, background-color 0.3s; transform-style: preserve-3d; }
+    .tilt-card:hover { border-color: #9281f7; background-color: rgba(146, 129, 247, 0.05); }
+    .tilt-card img { transform: translateZ(20px); }
+    .tilt-card h3 { transform: translateZ(30px); }
+    .tilt-card p { transform: translateZ(10px); }
+
   </style>
 </head>
 <body class="selection:bg-accent text-primary">
+
+  <!-- Initialize Overlay (Bypasses Browser Autoplay Block) -->
+  <div id="enter-overlay" class="fixed inset-0 z-[100000] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000 cursor-pointer">
+     <h1 class="font-mono text-primary text-2xl tracking-[0.5em] animate-pulse">FOG1CH</h1>
+     <p class="text-muted text-[10px] font-mono mt-6 tracking-widest uppercase">[ CLICK ANYWHERE TO INITIALIZE SYSTEM ]</p>
+  </div>
+
 
   <canvas id="stars-canvas"></canvas>
   <div id="cursor-dot" class="hidden md:block"></div>
   <div id="cursor-ring" class="hidden md:block"></div>
 
   <!-- TRUE HIDDEN SOUNDCLOUD IFRAME -->
-  <iframe id="sc-iframe" style="position:fixed; left:-9999px; top:-9999px; width:400px; height:200px;" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2057072952&color=%23ffffff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>
+  <iframe id="sc-iframe" style="position:fixed; left:-9999px; top:-9999px; width:400px; height:200px;" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2057072952&color=%23ffffff&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>
 
   <!-- Music Player (Top Left, Visible, With Dynamic Avatar API) -->
-  <div id="music-controls" class="fixed top-4 left-4 z-[9999] bg-[#050505] border border-graphite rounded-xl p-2 flex items-center gap-3 shadow-2xl transition-all blur-fade visible">
+  <div id="music-controls" class="fixed bottom-4 left-4 right-4 md:right-auto md:top-4 md:bottom-auto z-[9999] bg-[#050505] border border-graphite rounded-xl p-2 flex items-center justify-between md:justify-start gap-3 shadow-2xl transition-all blur-fade visible">
     <img id="music-avatar" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/CD_icon_test.svg/240px-CD_icon_test.svg.png" class="w-10 h-10 rounded-lg border border-graphite object-cover">
     <div class="flex flex-col">
       <span class="text-xs font-bold text-primary font-mono max-w-[150px] truncate">Medasin - Magic</span>
@@ -186,7 +203,7 @@
   <nav class="fixed top-0 right-0 w-full z-40 bg-transparent pointer-events-none">
     <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-end font-mono text-xs text-muted pointer-events-auto">
       
-      <div class="bg-surface/80 backdrop-blur-md border border-graphite px-3 py-1 rounded-md flex items-center gap-2 mr-2">
+      <div class="hidden md:flex bg-surface/80 backdrop-blur-md border border-graphite px-3 py-1 rounded-md items-center gap-2 mr-2">
         <span class="inline-block w-2 h-2 rounded-full bg-success animate-pulse"></span>
         <span id="nav-time" class="text-primary font-bold">--:--</span>
       </div>
@@ -198,10 +215,10 @@
   </nav>
 
   <!-- Hero Section -->
-  <main class="max-w-5xl mx-auto px-6 pt-32 sm:pt-40 pb-20 relative blur-fade">
+  <main class="max-w-5xl mx-auto px-4 md:px-6 pt-24 sm:pt-40 pb-16 md:pb-20 relative blur-fade">
     <div class="font-mono text-xs text-accent tracking-widest mb-6 uppercase">&gt; INITIALIZE.PROFILE</div>
     
-    <h1 class="text-6xl md:text-8xl font-bold tracking-tight mb-8 glow-text">Fog1ch.</h1>
+    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 glow-text">Fog1ch.</h1>
     <p id="typing-text" class="text-muted text-xl md:text-2xl max-w-2xl min-h-[70px] cursor-blink leading-relaxed"></p>
     
     <div class="flex flex-wrap gap-3 mt-10 font-mono text-xs tracking-widest uppercase">
@@ -212,21 +229,21 @@
 
     <!-- Socials / IconButton / MetalButton (With direct SVGs) -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 max-w-2xl">
-      <a href="https://t.me/Fog1ch0" target="_blank" class="metal-btn interactive p-4 flex items-center gap-3">
+      <a href="https://t.me/Fog1ch0" target="_blank" class="metal-btn interactive magnetic p-4 flex items-center gap-3">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         <div class="flex flex-col text-left">
           <span class="font-medium text-sm">Telegram</span>
           <span class="font-mono text-[10px] text-muted">@Fog1ch0</span>
         </div>
       </a>
-      <a href="https://youtube.com/@Fog1ch" target="_blank" class="metal-btn interactive p-4 flex items-center gap-3">
+      <a href="https://youtube.com/@Fog1ch" target="_blank" class="metal-btn interactive magnetic p-4 flex items-center gap-3">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
         <div class="flex flex-col text-left">
           <span class="font-medium text-sm">YouTube</span>
           <span class="font-mono text-[10px] text-muted">@Fog1ch</span>
         </div>
       </a>
-      <a href="https://github.com/Fog1ch" target="_blank" class="metal-btn interactive p-4 flex items-center gap-3">
+      <a href="https://github.com/Fog1ch" target="_blank" class="metal-btn interactive magnetic p-4 flex items-center gap-3">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
         <div class="flex flex-col text-left">
           <span class="font-medium text-sm">GitHub</span>
@@ -237,7 +254,7 @@
   </main>
 
   <!-- Discord Presence -->
-  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+  <section class="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite blur-fade">
     <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; SYS.PRESENCE // LANYARD</div>
     <div class="cutout-card flex flex-col sm:flex-row items-center gap-8 max-w-3xl">
       <div class="cutout-corner"></div>
@@ -253,13 +270,15 @@
         <div id="presence-custom-status" class="text-sm text-muted italic mb-4 min-h-[20px]"></div>
         <div class="bg-void border border-graphite px-4 py-3 rounded-lg font-mono text-xs text-muted text-left">
           <div id="presence-activity">&gt; SYS.IDLE // No active tasks</div>
-        </div>
+          </div>
+          
+          
       </div>
     </div>
   </section>
 
   <!-- Hardware Setup -->
-  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+  <section class="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite blur-fade">
     <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; HW.SETUP</div>
     <h2 class="text-3xl font-semibold mb-10" data-i18n="hw_title">Hardware Setup</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -293,27 +312,33 @@
   </section>
 
   <!-- Network / Friends -->
-  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+  <section class="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite blur-fade">
     <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; USERS.TRUSTED</div>
-    <h2 class="text-3xl font-semibold mb-10 text-primary">V.I.P. Connections</h2>
+    <h2 class="text-3xl font-semibold mb-10 text-primary" data-i18n="vip_title">V.I.P. Connections</h2>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-      <div class="friend-card p-8 flex flex-col items-center text-center interactive">
-        <img src="https://i.pinimg.com/736x/90/22/3e/90223e99813d3303f80cf698e07e6f66.jpg" class="w-20 h-20 rounded-full object-cover mb-6 border-2 border-graphite">
-        <h3 class="font-mono text-primary text-lg mb-3">alexmanofficial</h3>
-        <p class="text-sm text-muted leading-relaxed italic" data-i18n="friend_1_quote">"psychopath, manipulator, billionaire (not yet)"</p>
-      </div>
-      <div class="friend-card p-8 flex flex-col items-center text-center interactive">
-        <img src="https://cdn.discordapp.com/avatars/577356669185425428/ce6662b5dc21cb22c3ccda7e613a0152.webp?size=1280" class="w-20 h-20 rounded-full object-cover mb-6 border-2 border-graphite">
-        <h3 class="font-mono text-primary text-lg mb-3">obergruppenfuhrer1488</h3>
-        <p class="text-sm text-muted leading-relaxed italic" data-i18n="friend_new_quote">"цыган1488,не суди не буди недабуди дабудай дабуди будай"</p>
-      </div>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto">
+        
+        <div class="tilt-card p-4 md:p-5 border border-graphite rounded-xl flex items-center gap-4 md:gap-5 bg-surface/30 cursor-crosshair">
+          <img src="https://i.pinimg.com/736x/90/22/3e/90223e99813d3303f80cf698e07e6f66.jpg" class="w-14 h-14 rounded-full object-cover border border-graphite flex-shrink-0 opacity-90">
+          <div class="text-left flex-1">
+            <h3 class="font-mono text-primary text-base">alexmanofficial</h3>
+            <p class="text-xs text-muted italic mt-1 leading-snug" data-i18n="friend_1_quote">"psychopath, manipulator, billionaire (not yet)"</p>
+          </div>
+        </div>
 
-  </section>
+        <div class="tilt-card p-4 md:p-5 border border-graphite rounded-xl flex items-center gap-4 md:gap-5 bg-surface/30 cursor-crosshair">
+          <img src="https://cdn.discordapp.com/avatars/577356669185425428/ce6662b5dc21cb22c3ccda7e613a0152.webp?size=1280" class="w-14 h-14 rounded-full object-cover border border-graphite flex-shrink-0 opacity-90">
+          <div class="text-left flex-1">
+            <h3 class="font-mono text-primary text-base">obergruppenfuhrer1488</h3>
+            <p class="text-xs text-muted italic mt-1 leading-snug" data-i18n="friend_new_quote">"цыган1488,не суди не буди недабуди дабудай дабуди будай"</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
   <!-- Roadmap & Telemetry Map -->
-  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+  <section class="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite blur-fade">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
       
       <!-- Roadmap -->
@@ -496,7 +521,7 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
       </div>
       <div class="flex flex-col">
-        <span class="font-mono text-xs text-muted tracking-widest uppercase mb-1">T-MINUS TO ACADEMY 2026</span>
+        <span id="timer-title" class="font-mono text-xs text-muted tracking-widest uppercase mb-1 transition-all">T-MINUS TO ACADEMY 2026</span>
         <div id="countdown-timer" class="font-mono text-3xl font-bold tracking-wider text-primary">
           --D --H --M --S
         </div>
@@ -504,8 +529,27 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
     </div>
   </section>
 
-  <!-- Terminal -->
-  <section class="hidden md:block max-w-5xl mx-auto px-6 py-16 border-t border-graphite mb-20 blur-fade">
+  
+    <!-- Telegram Life Section -->
+    <section class="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite blur-fade">
+      <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; CHANNEL.PERSONAL</div>
+      <h2 class="text-3xl font-semibold mb-10 text-primary" data-i18n="tg_life_title">Telegram: Life</h2>
+      
+      <div class="cutout-card flex flex-col md:flex-row items-center gap-8 p-6 md:p-10 justify-between">
+        <div class="flex-1 text-left">
+          <h3 class="text-2xl font-bold mb-4 font-mono text-white" data-i18n="tg_life_subtitle">My Personal Channel</h3>
+          <p class="text-muted leading-relaxed mb-6" data-i18n="tg_life_desc">Join my exclusive Telegram channel to follow my daily grind, insights, and behind-the-scenes life.</p>
+          <a href="https://t.me/+tOQ-R-xA0lxmMjA8" target="_blank" class="metal-btn inline-block font-mono tracking-widest text-sm text-center px-8 py-3 interactive text-primary border border-graphite rounded-lg bg-graphite/20 hover:border-accent hover:text-accent transition-colors" data-i18n="tg_life_btn">JOIN CHANNEL</a>
+        </div>
+        <div class="w-48 h-48 flex-shrink-0 border-2 border-accent rounded-xl overflow-hidden shadow-[0_0_20px_rgba(146,129,247,0.3)] hover:scale-105 transition-transform duration-300">
+          <img src="tg_qr.png" class="w-full h-full object-cover" alt="Telegram QR">
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Terminal -->
+  <section class="hidden md:block max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite mb-20 blur-fade">
     <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; SYS.CONSOLE</div>
     
     <div class="border border-graphite rounded-xl bg-void overflow-hidden shadow-2xl relative z-10">
@@ -625,23 +669,33 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
     const i18n = {
       en: {
         bio_text: "Software Engineering & AI enthusiast. Building the future from Poland.",
-        tag_poland: "[ POLAND ]", tag_se: "[ SOFTWARE ENG ]", tag_ai: "[ AI / ML ]", hw_title: "Hardware Setup", timeline_title: "Roadmap",
-        time_1_date: "2026 / PRESENT", time_1_title: "Accepted to College", time_1_desc: "Started studying as a Software Engineering Technician with an AI focus in Poland.",
-        time_2_date: "2026 - 2031", time_2_title: "5 Years of Grind & Study", time_2_desc: "Deep dive into programming, math, building complex projects, and surviving the matrix.",
-        time_4_date: "FUTURE", time_4_title: "Graduate", time_4_desc: "Becoming a full-time Senior AI / Software Engineer. The real game begins.",
+        tag_poland: "[ POLAND ]", tag_se: "[ SOFTWARE ENG ]", tag_ai: "[ AI / ML ]", 
+        hw_title: "Hardware Setup", timeline_title: "Roadmap", vip_title: "V.I.P. Connections",
+        time_1_date: "2026 / PRESENT", time_1_title: "Accepted to College", 
+        time_2_date: "2026 - 2031", time_2_title: "5 Years of Grind & Study", 
+        time_4_date: "FUTURE", time_4_title: "Graduate",
         friend_1_quote: '"psychopath, manipulator, billionaire (not yet)"',
         friend_new_quote: '"gypsy1488, don\'t judge don\'t wake nedabudi dabudai dabudi budai"',
+        tg_life_title: "Telegram: Life",
+        tg_life_subtitle: "My Personal Channel",
+        tg_life_desc: "Join my exclusive Telegram channel to follow my daily grind, insights, and behind-the-scenes life.",
+        tg_life_btn: "JOIN CHANNEL",
         peak_title: "Expedition: AI & Core", peak_item1: "AI: Neural Networks", peak_item2: "Lang: Polish"
       },
       ru: {
         bio_text: "Разработчик ПО и энтузиаст ИИ. Строю будущее из Польши.",
-        tag_poland: "[ ПОЛЬША ]", tag_se: "[ РАЗРАБОТКА ПО ]", tag_ai: "[ ИИ / МО ]", hw_title: "Железо / Сетап", timeline_title: "Таймлайн / Цели",
-        time_1_date: "2026 / ТЕКУЩЕЕ", time_1_title: "Принятие в училище", time_1_desc: "Начал обучение на техника-программиста с уклоном в ИИ в Польше.",
-        time_2_date: "2026 - 2031", time_2_title: "5 лет гринда и учёбы", time_2_desc: "Глубокое погружение в код, создание проектов и выживание в матрице.",
-        time_4_date: "БУДУЩЕЕ", time_4_title: "Выпускник", time_4_desc: "Становление Senior AI инженером. Начало настоящей игры.",
+        tag_poland: "[ ПОЛЬША ]", tag_se: "[ РАЗРАБОТКА ПО ]", tag_ai: "[ ИИ / ML ]", 
+        hw_title: "Оборудование / Сетап", timeline_title: "План / Дорожная Карта", vip_title: "VIP Контакты",
+        time_1_date: "2026 / СЕЙЧАС", time_1_title: "Принятие в училище", 
+        time_2_date: "2026 - 2031", time_2_title: "5 лет гринда и учёбы", 
+        time_4_date: "БУДУЩЕЕ", time_4_title: "Выпускник",
         friend_1_quote: '"psychopath, manipulator, billionaire (not yet)"',
         friend_new_quote: '"цыган1488,не суди не буди недабуди дабудай дабуди будай"',
-        peak_title: "Экспедиция: ИИ и Фундаментал", peak_item1: "AI: Нейронные сети", peak_item2: "Язык: Польский"
+        tg_life_title: "Telegram: Life",
+        tg_life_subtitle: "Мой Личный Канал",
+        tg_life_desc: "Присоединяйся к моему эксклюзивному Telegram-каналу, чтобы следить за повседневным гриндом, мыслями и жизнью за кадром.",
+        tg_life_btn: "ПРИСОЕДИНИТЬСЯ",
+        peak_title: "Фокус: ИИ & Разработка", peak_item1: "AI: Нейросети", peak_item2: "Язык: Польский"
       }
     };
     let currentLang = 'en'; // DEFAULT IS ENGLISH
@@ -684,7 +738,7 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
     /* ================================================================
        CLOCK & TIMER (WROCLAW) - WRAPPED IN TRY CATCH SO IT NEVER BREAKS
     ================================================================ */
-    const targetDate = new Date('2026-09-01T08:00:00').getTime();
+    
     function tick() {
       const now = new Date();
       let timeStr = "";
@@ -703,13 +757,37 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
       if(navTime) navTime.textContent = timeStr;
 
       try {
-        const dist = targetDate - now.getTime();
-        const cdEl = document.getElementById('countdown-timer');
-        if (dist < 0) cdEl.textContent = "ACADEMY STARTED";
-        else {
-          cdEl.textContent = `${Math.floor(dist/86400000)}D ${Math.floor((dist%86400000)/3600000).toString().padStart(2,'0')}H ${Math.floor((dist%3600000)/60000).toString().padStart(2,'0')}M ${Math.floor((dist%60000)/1000).toString().padStart(2,'0')}S`;
-        }
-      } catch(e) {}
+          const target1 = new Date('2026-09-01T00:00:00').getTime();
+          const target2 = new Date('2031-09-01T00:00:00').getTime();
+          const cdEl = document.getElementById('countdown-timer');
+          const titleEl = document.getElementById('timer-title');
+          const nowMs = now.getTime();
+          
+          if (nowMs < target1) {
+            if (titleEl) titleEl.textContent = 'T-MINUS TO ACADEMY 2026';
+            const dist = target1 - nowMs;
+            const d = Math.floor(dist/86400000);
+            const h = Math.floor((dist%86400000)/3600000).toString().padStart(2,'0');
+            const m = Math.floor((dist%3600000)/60000).toString().padStart(2,'0');
+            const s = Math.floor((dist%60000)/1000).toString().padStart(2,'0');
+            if (cdEl) cdEl.textContent = d + 'D ' + h + 'H ' + m + 'M ' + s + 'S';
+          } else if (nowMs < target2) {
+            if (titleEl) titleEl.textContent = 'T-MINUS TO GRADUATION (5 YEARS GRIND)';
+            const dist = target2 - nowMs;
+            const totalDays = Math.floor(dist / 86400000);
+            const months = Math.floor(totalDays / 30.436875);
+            const remDays = totalDays - Math.floor(months * 30.436875);
+            const weeks = Math.floor(remDays / 7);
+            const days = remDays % 7;
+            const h = Math.floor((dist%86400000)/3600000).toString().padStart(2,'0');
+            const m = Math.floor((dist%3600000)/60000).toString().padStart(2,'0');
+            const s = Math.floor((dist%60000)/1000).toString().padStart(2,'0');
+            if (cdEl) cdEl.textContent = months + 'M ' + weeks + 'W ' + days + 'D ' + h + 'H ' + m + 'M ' + s + 'S';
+          } else {
+            if (titleEl) titleEl.textContent = 'MISSION COMPLETE';
+            if (cdEl) cdEl.textContent = 'GRADUATED';
+          }
+        } catch(e) {}
     }
     setInterval(tick, 1000); tick();
 
@@ -780,9 +858,65 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
     ================================================================ */
     let scWidget = null, isPlaying = false;
     
-    window.addEventListener('load', () => {
+    
+    window.addEventListener('scroll', () => {
+      const winHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (document.documentElement.scrollTop / winHeight) * 100;
+      const prog = document.getElementById('scroll-progress');
+      if(prog) prog.style.width = scrolled + '%';
+    });
+  
+  window.addEventListener('load', () => {
+
+
+    
+    if (window.matchMedia('(pointer: fine)').matches) {
+      document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -10; 
+        const rotateY = ((x - centerX) / centerX) * 10;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+      });
+    });
+    }
+  
+    if (window.matchMedia('(pointer: fine)').matches) {
+      document.querySelectorAll('.magnetic').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.15;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.15;
+        btn.style.transform = `translate(${x}px, ${y}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = `translate(0px, 0px)`;
+      });
+    });
+    }
+  
       if (typeof SC !== 'undefined') {
         scWidget = SC.Widget(document.getElementById('sc-iframe'));
+
+          // Initialize Overlay Logic
+          const overlay = document.getElementById('enter-overlay');
+          if (overlay) {
+            overlay.addEventListener('click', () => {
+              overlay.style.opacity = '0';
+              setTimeout(() => overlay.remove(), 1000);
+              if (scWidget) scWidget.play();
+            });
+          }
+  
         
         
         scWidget.bind(SC.Widget.Events.READY, () => {
@@ -790,6 +924,12 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
           
   
           // Fetch real avatar from API instead of hardcoded link
+          
+          scWidget.bind(SC.Widget.Events.FINISH, () => {
+            scWidget.seekTo(0);
+            scWidget.play();
+          });
+          
           scWidget.getCurrentSound(sound => {
             if(sound && sound.artwork_url) {
               document.getElementById('music-avatar').src = sound.artwork_url.replace('large', 't500x500');
@@ -845,4 +985,3 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
 
   </script>
 </body>
-</html>
