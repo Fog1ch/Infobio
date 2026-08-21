@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fog1ch — Final Version</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            void: "#000000",
+            graphite: "#292d30",
+            surface: "#0a0a0a",
+            primary: "#ffffff",
+            muted: "#a1a4a5",
+            accent: "#9281f7",
+            success: "#3ad389",
+            danger: "#ff6465"
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- SoundCloud Widget API -->
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+
+  <style>
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    
+    @media (pointer: fine) {
+      body, .interactive, .metal-btn { cursor: none !important; }
+    }
+
+    ::selection { background: #9281f7; color: #fff; }
+
+    /* Custom Cursor - MADE PURE WHITE (Removed mix-blend-mode difference) */
+    #cursor-dot { position: fixed; top: 0; left: 0; width: 8px; height: 8px; background-color: #ffffff !important; box-shadow: 0 0 10px rgba(255,255,255,1); border-radius: 50%; pointer-events: none; z-index: 2147483647; transition: opacity 0.2s; will-change: transform; }
+    #cursor-ring { position: fixed; top: 0; left: 0; width: 36px; height: 36px; border: 2px solid #ffffff !important; box-shadow: 0 0 10px rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 2147483646; transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s; will-change: transform; }
+    .hovered-ring { width: 56px !important; height: 56px !important; border-color: #9281f7 !important; background-color: rgba(146,129,247,0.15) !important; box-shadow: 0 0 15px rgba(146,129,247,0.8) !important; }
+
+    /* Stars Background */
+    #stars-canvas {
+      position: fixed; inset: 0; z-index: -1;
+      background: radial-gradient(ellipse at bottom, #111 0%, #000 100%);
+      pointer-events: none;
+    }
+
+    /* BlurFade */
+    .blur-fade {
+      opacity: 0; filter: blur(8px); transform: translateY(20px);
+      transition: opacity 0.8s ease-out, filter 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .blur-fade.visible { opacity: 1; filter: blur(0); transform: translateY(0); }
+
+    /* Typing cursor */
+    .cursor-blink::after { content: '|'; animation: blink 1s step-end infinite; color: #9281f7; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Tags & Cards */
+    .hero-tag { transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); border: 1px solid #292d30; background: #0a0a0a; }
+    .hero-tag:hover { border-color: #9281f7; color: #9281f7; transform: translateY(-3px); box-shadow: 0 6px 16px rgba(146,129,247,0.15); }
+
+    .metal-btn { position: relative; background: #000; border: 1px solid #292d30; color: #fff; border-radius: 8px; overflow: hidden; z-index: 1; transition: transform 0.2s ease, border-color 0.2s ease;  }
+    .metal-btn::before { content: ""; position: absolute; inset: -50%; background: conic-gradient(from 0deg, transparent 0%, rgba(146,129,247,0.5) 10%, transparent 20%); animation: spin 4s linear infinite; z-index: -1; opacity: 0; transition: opacity 0.3s ease; }
+    .metal-btn:hover { border-color: rgba(146,129,247,0.4); transform: scale(0.98); }
+    .metal-btn:hover::before { opacity: 1; }
+    .metal-btn::after { content: ""; position: absolute; inset: 1px; background: #0a0a0a; border-radius: 7px; z-index: -1; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .cutout-card { position: relative; background: #0a0a0a; border: 1px solid #292d30; border-radius: 16px; padding: 24px; clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%); transition: transform 0.4s ease, border-color 0.3s ease; }
+    .cutout-card:hover { transform: translateY(-5px); border-color: #464a4d; }
+    .cutout-corner { position: absolute; top: 0; right: 0; width: 24px; height: 24px; background: transparent; border-bottom-left-radius: 8px; border-left: 1px solid #292d30; border-bottom: 1px solid #292d30; transition: border-color 0.3s ease; }
+    .cutout-card:hover .cutout-corner { border-color: #464a4d; }
+
+    .friend-card { background: #0a0a0a; border: 1px solid #292d30; border-radius: 12px; transition: all 0.4s ease; position: relative; overflow: hidden; }
+    .friend-card:hover { transform: translateY(-5px) scale(1.02); border-color: #9281f7; box-shadow: 0 10px 30px rgba(146,129,247,0.1); z-index: 2; }
+
+    /* Map & Marker */
+    .real-map { 
+      
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      
+      position: absolute; inset: 0; z-index: 0; opacity: 0.6;
+    }
+    .map-marker { 
+      position: absolute; 
+      width: 10px; height: 10px; 
+      background: #3ad389; 
+      border-radius: 50%; 
+      box-shadow: 0 0 10px #3ad389, 0 0 20px #3ad389; 
+      animation: pulseMarker 2s infinite; 
+      z-index: 1; 
+      /* Wroclaw roughly on the Poland SVG */
+      top: 67%; left: 33%;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes pulseMarker { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.6); opacity: 0.4; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+    /* Interactive */
+    .interactive { transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;  }
+    .interactive:active { transform: scale(0.95); }
+
+    /* Status Dots */
+    .dot-online  { background: #3ad389; box-shadow: 0 0 8px #3ad389; }
+    .dot-idle    { background: #f5a623; box-shadow: 0 0 8px #f5a623; }
+    .dot-dnd     { background: #ff6465; box-shadow: 0 0 8px #ff6465; }
+    .dot-offline { background: #555; }
+    
+    /* Glitch Animation */
+    @keyframes glitch-anim { 0% { transform: translate(0) } 20% { transform: translate(-2px, 1px) } 40% { transform: translate(-1px, -1px) } 60% { transform: translate(2px, 1px) } 80% { transform: translate(1px, -1px) } 100% { transform: translate(0) } }
+  
+    /* Range Slider */
+    
+    
+    /* Cool Animations */
+    @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .anim-float { animation: floatY 6s ease-in-out infinite; }
+    .anim-float-delayed { animation: floatY 6s ease-in-out infinite; animation-delay: 3s; }
+    
+     50% { text-shadow: 0 0 30px rgba(146, 129, 247, 0.9); } }
+    . { animation: pulseGlow 4s ease-in-out infinite; }
+    
+    @keyframes pulse-border { 0%, 100% { border-color: #292d30; } 50% { border-color: #9281f7; } }
+    .anim-border { animation: pulse-border 4s infinite; }
+  </style>
+</head>
+<body class="selection:bg-accent text-primary">
+
+  <canvas id="stars-canvas"></canvas>
+  <div id="cursor-dot" class="hidden md:block"></div>
+  <div id="cursor-ring" class="hidden md:block"></div>
+
+  <!-- TRUE HIDDEN SOUNDCLOUD IFRAME -->
+  <iframe id="sc-iframe" style="position:fixed; left:-9999px; top:-9999px; width:400px; height:200px;" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2057072952&color=%23ffffff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>
+
+  <!-- Music Player (Top Left, Visible, With Dynamic Avatar API) -->
+  <div id="music-controls" class="fixed top-4 left-4 z-[9999] bg-[#050505] border border-graphite rounded-xl p-2 flex items-center gap-3 shadow-2xl transition-all blur-fade visible">
+    <img id="music-avatar" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/CD_icon_test.svg/240px-CD_icon_test.svg.png" class="w-10 h-10 rounded-lg border border-graphite object-cover">
+    <div class="flex flex-col">
+      <span class="text-xs font-bold text-primary font-mono max-w-[150px] truncate">Medasin - Magic</span>
+      <span class="text-[10px] text-muted font-mono">SoundCloud</span>
+    </div>
+    <button id="btn-play-pause" class="w-8 h-8 flex items-center justify-center bg-[#111] border border-graphite rounded-full hover:border-accent hover:text-accent ml-2 interactive transition-all" onclick="togglePlayPause()">
+      <svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      <svg id="pause-icon" class="hidden" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+    </button>
+
+      <!-- Redesigned Volume Mixer -->
+      <div class="flex items-center gap-2 ml-2 hidden md:flex border-l border-graphite pl-4">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <div class="relative w-20 h-1.5 group">
+           <input type="range" id="sc-volume" min="0" max="100" value="100" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" oninput="updateVolumeVisual(this.value)">
+           <div class="absolute inset-0 w-full h-full bg-[#1a1c1e] rounded-full overflow-hidden pointer-events-none">
+               <div id="vol-fill" class="h-full bg-accent w-full transition-all duration-75"></div>
+           </div>
+           <div id="vol-thumb" class="absolute top-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_10px_#9281f7] pointer-events-none transition-all duration-75 group-hover:scale-125" style="left: 100%; transform: translate(-50%, -50%);"></div>
+        </div>
+      </div>
+
+    </div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 right-0 w-full z-40 bg-transparent pointer-events-none">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-end font-mono text-xs text-muted pointer-events-auto">
+      
+      <div class="bg-surface/80 backdrop-blur-md border border-graphite px-3 py-1 rounded-md flex items-center gap-2 mr-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-success animate-pulse"></span>
+        <span id="nav-time" class="text-primary font-bold">--:--</span>
+      </div>
+      <div class="flex gap-2 bg-surface/80 backdrop-blur-md border border-graphite p-1 rounded-md">
+        <button class="interactive px-3 py-1 rounded transition-colors text-primary bg-graphite font-medium" id="lang-en" onclick="setLang('en')">EN</button>
+        <button class="interactive px-3 py-1 rounded transition-colors hover:text-primary font-medium" id="lang-ru" onclick="setLang('ru')">RU</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 pt-32 sm:pt-40 pb-20 relative blur-fade">
+    <div class="font-mono text-xs text-accent tracking-widest mb-6 uppercase">&gt; INITIALIZE.PROFILE</div>
+    
+    <h1 class="text-6xl md:text-8xl font-bold tracking-tight mb-8 glow-text">Fog1ch.</h1>
+    <p id="typing-text" class="text-muted text-xl md:text-2xl max-w-2xl min-h-[70px] cursor-blink leading-relaxed"></p>
+    
+    <div class="flex flex-wrap gap-3 mt-10 font-mono text-xs tracking-widest uppercase">
+      <span class="hero-tag px-4 py-2 rounded text-muted interactive" data-i18n="tag_poland">[ POLAND ]</span>
+      <span class="hero-tag px-4 py-2 rounded text-muted interactive" data-i18n="tag_se">[ SOFTWARE ENG ]</span>
+      <span class="hero-tag px-4 py-2 rounded text-muted interactive" data-i18n="tag_ai">[ AI / ML ]</span>
+    </div>
+
+    <!-- Socials / IconButton / MetalButton (With direct SVGs) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 max-w-2xl">
+      <a href="https://t.me/Fog1ch0" target="_blank" class="metal-btn interactive p-4 flex items-center gap-3">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <div class="flex flex-col text-left">
+          <span class="font-medium text-sm">Telegram</span>
+          <span class="font-mono text-[10px] text-muted">@Fog1ch0</span>
+        </div>
+      </a>
+      <a href="https://youtube.com/@Fog1ch" target="_blank" class="metal-btn interactive p-4 flex items-center gap-3">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+        <div class="flex flex-col text-left">
+          <span class="font-medium text-sm">YouTube</span>
+          <span class="font-mono text-[10px] text-muted">@Fog1ch</span>
+        </div>
+      </a>
+      <a href="https://github.com/Fog1ch" target="_blank" class="metal-btn interactive p-4 flex items-center gap-3">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        <div class="flex flex-col text-left">
+          <span class="font-medium text-sm">GitHub</span>
+          <span class="font-mono text-[10px] text-muted">github.com/Fog1ch</span>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <!-- Discord Presence -->
+  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+    <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; SYS.PRESENCE // LANYARD</div>
+    <div class="cutout-card flex flex-col sm:flex-row items-center gap-8 max-w-3xl">
+      <div class="cutout-corner"></div>
+      <div class="relative shrink-0">
+        <img id="presence-avatar" src="https://i.pinimg.com/736x/d5/f2/0c/d5f20c5325d94301345c43a293a0b150.jpg" class="w-24 h-24 rounded-full border-2 border-graphite object-cover">
+        <div id="presence-status-dot" class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#555] border-4 border-[#0a0a0a]"></div>
+      </div>
+      <div class="w-full text-center sm:text-left">
+        <div class="flex justify-center sm:justify-start items-center gap-3 mb-2">
+          <span class="font-semibold text-2xl text-primary">Fog1ch</span>
+          <span id="presence-status-text" class="font-mono text-xs text-muted tracking-widest uppercase">OFFLINE</span>
+        </div>
+        <div id="presence-custom-status" class="text-sm text-muted italic mb-4 min-h-[20px]"></div>
+        <div class="bg-void border border-graphite px-4 py-3 rounded-lg font-mono text-xs text-muted text-left">
+          <div id="presence-activity">&gt; SYS.IDLE // No active tasks</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hardware Setup -->
+  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+    <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; HW.SETUP</div>
+    <h2 class="text-3xl font-semibold mb-10" data-i18n="hw_title">Hardware Setup</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="cutout-card">
+        <div class="cutout-corner"></div>
+        <div class="flex items-center gap-3 mb-6 text-muted font-mono text-xs tracking-widest">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> DEVICE_01
+        </div>
+        <div class="text-xl font-medium mb-6 text-primary">Lenovo IdeaPad Gaming 3-15</div>
+        <div class="space-y-4 font-mono text-xs text-muted">
+          <div class="flex justify-between border-b border-graphite pb-2"><span>GPU</span><span class="text-primary">RTX 3050 Ti</span></div>
+          <div class="flex justify-between border-b border-graphite pb-2"><span>CPU</span><span class="text-primary">Ryzen 7</span></div>
+          <div class="flex justify-between border-b border-graphite pb-2"><span>RAM</span><span class="text-primary">16 GB</span></div>
+          <div class="flex justify-between pb-2"><span>STORAGE</span><span class="text-primary">512GB + 3TB</span></div>
+        </div>
+      </div>
+      <div class="cutout-card">
+        <div class="cutout-corner"></div>
+        <div class="flex items-center gap-3 mb-6 text-muted font-mono text-xs tracking-widest">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> DEVICE_02
+        </div>
+        <div class="text-xl font-medium mb-6 text-primary">Samsung S23 Ultra</div>
+        <div class="space-y-4 font-mono text-xs text-muted">
+          <div class="flex justify-between border-b border-graphite pb-2"><span>STORAGE</span><span class="text-primary">1 TB</span></div>
+          <div class="flex justify-between border-b border-graphite pb-2"><span>RAM</span><span class="text-primary">12 GB</span></div>
+          <div class="flex justify-between border-b border-graphite pb-2"><span>DISPLAY</span><span class="text-primary">6.8" QHD+</span></div>
+          <div class="flex justify-between pb-2"><span>OS</span><span class="text-primary">Android 14</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Network / Friends -->
+  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+    <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; USERS.TRUSTED</div>
+    <h2 class="text-3xl font-semibold mb-10 text-primary">V.I.P. Connections</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+      <div class="friend-card p-8 flex flex-col items-center text-center interactive">
+        <img src="https://i.pinimg.com/736x/90/22/3e/90223e99813d3303f80cf698e07e6f66.jpg" class="w-20 h-20 rounded-full object-cover mb-6 border-2 border-graphite">
+        <h3 class="font-mono text-primary text-lg mb-3">alexmanofficial</h3>
+        <p class="text-sm text-muted leading-relaxed italic" data-i18n="friend_1_quote">"psychopath, manipulator, billionaire (not yet)"</p>
+      </div>
+      <div class="friend-card p-8 flex flex-col items-center text-center interactive">
+        <img src="https://cdn.discordapp.com/avatars/577356669185425428/ce6662b5dc21cb22c3ccda7e613a0152.webp?size=1280" class="w-20 h-20 rounded-full object-cover mb-6 border-2 border-graphite">
+        <h3 class="font-mono text-primary text-lg mb-3">obergruppenfuhrer1488</h3>
+        <p class="text-sm text-muted leading-relaxed italic" data-i18n="friend_new_quote">"цыган1488,не суди не буди недабуди дабудай дабуди будай"</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Roadmap & Telemetry Map -->
+  <section class="max-w-5xl mx-auto px-6 py-16 border-t border-graphite blur-fade">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      
+      <!-- Roadmap -->
+      <div>
+        <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; USR.TIMELINE</div>
+        <h2 class="text-3xl font-semibold mb-10 text-primary" data-i18n="timeline_title">Roadmap</h2>
+        <div class="border-l border-graphite pl-8 space-y-10 relative">
+          <div class="relative">
+            <div class="absolute -left-[37px] top-1 w-3 h-3 bg-success rounded-full ring-4 ring-void"></div>
+            <div class="font-mono text-xs text-muted mb-2 tracking-widest uppercase" data-i18n="time_1_date">2026 / PRESENT</div>
+            <div class="text-lg font-medium text-primary mb-2" data-i18n="time_1_title">Technikum Admission</div>
+            
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[37px] top-1 w-3 h-3 bg-accent rounded-full ring-4 ring-void shadow-[0_0_10px_#9281f7]"></div>
+            <div class="font-mono text-xs text-muted mb-2 tracking-widest uppercase" data-i18n="time_2_date">2026 - 2031</div>
+            <div class="text-lg font-medium text-primary mb-2" data-i18n="time_2_title">The 5-Year Grind</div>
+            
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[37px] top-1 w-3 h-3 bg-graphite rounded-full ring-4 ring-void"></div>
+            <div class="font-mono text-xs text-muted mb-2 tracking-widest uppercase" data-i18n="time_4_date">FUTURE</div>
+            <div class="text-lg font-medium text-primary mb-2" data-i18n="time_4_title">Graduation & Career</div>
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-10">
+        
+        <!-- Peak Cutout -->
+        <div class="cutout-card">
+          <div class="cutout-corner"></div>
+          <div class="font-mono text-xs text-muted mb-4 uppercase tracking-widest">&gt; SYS.PEAK</div>
+          <h3 class="text-2xl font-semibold mb-6 text-primary" data-i18n="peak_title">Expedition: AI & Core</h3>
+          <div class="space-y-4 font-mono text-xs">
+            <div class="flex justify-between border-b border-graphite pb-3">
+              <span class="text-primary text-sm" data-i18n="peak_item1">AI: Neural Networks</span><span class="text-success">[ACTIVE]</span>
+            </div>
+            <div class="flex justify-between pb-2">
+              <span class="text-primary text-sm" data-i18n="peak_item2">Lang: Polish</span><span class="text-success">[ACTIVE]</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real Map Telemetry with Wroclaw Temperature API -->
+        <div class="border border-graphite rounded-xl bg-void overflow-hidden relative p-4 h-[240px]">
+          <!-- Vector SVG Map of Poland -->
+          <div class="real-map flex items-center justify-center p-2 absolute inset-0 z-0 opacity-80"><svg class="w-full h-full text-[#111314]" version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="1024.000000pt" height="1024.000000pt" viewBox="0 0 1024.000000 1024.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)"
+fill="currentColor" stroke="none">
+<path d="M3945 9050 c-27 -5 -120 -25 -205 -46 -105 -25 -192 -39 -270 -44
+-152 -10 -343 -71 -458 -146 -66 -45 -190 -101 -250 -115 -26 -6 -90 -14 -142
+-18 -69 -5 -109 -14 -144 -30 -66 -32 -153 -116 -201 -194 -34 -55 -52 -72
+-119 -113 -102 -63 -156 -82 -234 -83 -34 -1 -88 -10 -120 -20 -31 -10 -111
+-29 -177 -41 -66 -11 -133 -26 -150 -31 -16 -6 -91 -21 -166 -34 -159 -27
+-166 -28 -239 -59 -91 -38 -148 -57 -300 -97 -80 -21 -191 -56 -248 -78 -57
+-23 -108 -41 -114 -41 -6 0 -32 -16 -59 -35 l-48 -34 -78 9 c-72 8 -80 7 -100
+-12 -27 -25 -30 -60 -8 -78 9 -7 38 -24 66 -36 42 -20 51 -21 55 -9 4 9 19 15
+38 15 17 0 42 9 56 20 33 26 146 29 136 4 -9 -23 11 -54 35 -54 29 0 22 -44
+-7 -48 -12 -2 -30 -12 -39 -22 -15 -17 -16 -28 -9 -72 7 -43 13 -54 31 -56 28
+-4 37 -30 18 -52 -8 -9 -15 -23 -15 -31 -1 -8 -8 0 -17 16 -31 59 -74 95 -114
+95 -54 0 -85 14 -105 49 -25 43 -44 47 -70 14 -35 -43 -33 -107 5 -141 29 -24
+30 -28 24 -86 -5 -54 -2 -66 19 -97 21 -32 54 -136 74 -239 4 -19 15 -46 25
+-59 25 -32 25 -35 -18 -87 -37 -43 -37 -46 -34 -118 3 -83 -10 -114 -57 -135
+-15 -7 -62 -35 -105 -63 l-78 -51 7 -43 c5 -34 2 -50 -15 -78 -12 -19 -18 -37
+-14 -39 4 -3 31 -8 60 -12 44 -6 58 -13 88 -46 19 -21 39 -39 44 -39 5 0 41
+-31 79 -68 49 -48 83 -72 113 -81 55 -17 120 -61 138 -95 13 -24 12 -28 -9
+-51 -21 -23 -22 -26 -8 -38 36 -28 31 -53 -17 -92 -54 -45 -56 -64 -21 -174
+26 -82 39 -96 97 -106 41 -7 44 -17 18 -65 -5 -9 -2 -22 8 -33 13 -13 14 -20
+5 -29 -7 -7 -12 -27 -12 -45 0 -28 5 -36 35 -50 25 -12 34 -22 29 -32 -3 -9
+-10 -41 -16 -71 -26 -149 -30 -160 -44 -160 -13 0 -104 -83 -104 -95 0 -2 13
+-19 29 -37 16 -18 34 -51 40 -73 8 -29 24 -49 56 -72 37 -28 45 -39 51 -79 6
+-42 4 -48 -26 -79 -18 -18 -30 -39 -28 -45 2 -7 60 -38 128 -69 107 -49 125
+-60 128 -81 5 -49 35 -132 48 -137 8 -3 14 -15 14 -27 1 -11 7 -37 14 -57 12
+-35 10 -44 -61 -224 -40 -103 -73 -193 -73 -200 0 -7 -18 -27 -39 -44 -34 -27
+-38 -35 -32 -59 7 -25 12 -27 64 -30 71 -4 97 9 97 48 0 15 8 42 17 59 17 29
+17 31 -2 45 -20 15 -20 15 3 38 12 12 22 17 22 10 0 -8 10 -9 30 -5 22 4 36 0
+51 -13 17 -15 23 -16 41 -5 15 9 23 10 31 2 6 -6 22 -11 34 -11 13 0 37 -10
+53 -22 28 -21 29 -22 14 -56 -13 -32 -12 -38 4 -66 11 -19 29 -33 45 -36 18
+-3 35 -18 51 -45 20 -33 30 -40 58 -41 79 -4 208 -32 242 -54 30 -18 47 -22
+92 -18 l54 5 31 -54 c33 -58 34 -58 67 -39 13 7 37 10 53 8 29 -4 32 -8 55
+-71 3 -11 11 -8 32 11 15 14 39 33 54 43 25 15 29 15 50 1 32 -23 65 -20 83 8
+15 23 18 23 64 11 56 -14 140 -72 141 -96 0 -9 -8 -27 -17 -40 -10 -13 -23
+-33 -29 -44 -6 -12 -24 -21 -41 -23 -20 -2 -50 -21 -84 -52 l-54 -48 40 -41
+c30 -32 46 -41 73 -41 28 0 35 -5 43 -30 8 -23 19 -31 46 -36 25 -5 40 -15 52
+-37 9 -16 30 -43 48 -59 23 -22 35 -45 43 -82 9 -43 18 -58 52 -84 49 -38 113
+-45 123 -14 3 11 15 24 28 29 12 6 41 26 64 45 24 20 68 43 102 54 34 10 61
+22 61 26 0 5 9 4 19 -1 17 -10 19 -6 23 34 3 44 2 45 -30 51 -28 6 -34 12 -44
+52 -6 24 -24 59 -39 77 -28 31 -28 33 -10 49 17 15 22 14 82 -13 45 -20 74
+-27 97 -24 44 7 122 -23 122 -46 0 -22 100 -56 137 -46 24 6 25 4 19 -28 -4
+-22 -2 -38 6 -44 7 -6 78 -11 162 -12 127 -2 151 1 167 15 11 9 19 23 19 31 0
+17 15 17 45 -3 21 -13 22 -19 13 -40 -9 -19 -8 -28 5 -42 10 -10 17 -23 17
+-28 -1 -16 -74 -56 -113 -62 -21 -2 -40 -9 -43 -14 -9 -13 45 -67 82 -82 19
+-9 45 -36 70 -74 31 -50 49 -66 88 -83 l48 -21 45 24 c24 13 55 37 68 55 23
+29 27 31 56 20 17 -7 38 -25 47 -42 23 -46 42 -56 69 -38 25 17 53 11 53 -11
+0 -8 12 -19 28 -25 15 -6 42 -20 61 -32 21 -12 43 -18 56 -15 13 3 49 -3 80
+-14 32 -11 72 -20 90 -20 27 0 33 -5 42 -34 6 -21 7 -38 2 -43 -6 -6 2 -40 18
+-86 l27 -77 78 -30 c42 -16 86 -30 97 -30 16 0 21 -11 30 -63 6 -35 11 -75 11
+-90 0 -14 5 -37 11 -50 10 -21 15 -23 65 -19 l54 4 0 -31 c0 -17 5 -51 12 -76
+14 -50 36 -63 85 -50 16 4 46 9 68 10 56 2 114 57 122 114 5 39 7 40 52 46 85
+11 91 14 91 40 0 28 26 45 69 45 25 0 37 -8 61 -42 16 -22 30 -47 30 -55 0 -8
+10 -37 21 -64 19 -43 25 -49 50 -49 22 0 32 -6 39 -25 10 -26 15 -28 94 -29
+57 -1 63 -11 65 -102 1 -27 7 -56 14 -63 8 -9 9 -15 1 -18 -6 -2 -25 -14 -42
+-27 l-32 -23 25 -23 c20 -18 32 -22 64 -17 22 3 53 15 68 27 31 24 67 20 96
+-11 11 -11 30 -24 44 -30 52 -20 58 -14 86 81 33 109 57 130 149 130 l57 0 7
+35 c6 34 8 36 43 34 20 -2 49 5 66 13 28 15 32 15 87 -13 32 -16 62 -29 68
+-29 6 0 13 13 16 29 6 28 9 29 53 28 25 -1 54 2 64 7 14 7 20 2 30 -23 6 -17
+16 -31 22 -31 6 0 24 -13 39 -29 19 -20 34 -27 51 -23 17 3 25 0 25 -10 0 -8
+11 -25 24 -37 37 -35 85 -23 120 30 15 22 38 45 51 51 19 9 25 19 25 44 0 27
+5 35 25 40 19 5 30 0 48 -21 21 -25 25 -26 45 -14 12 8 22 21 22 30 0 33 63
+38 150 13 66 -19 65 -19 160 -1 63 12 76 12 85 0 5 -7 33 -16 62 -19 48 -6 52
+-9 69 -46 13 -29 20 -35 26 -25 4 8 21 20 37 27 28 11 34 10 80 -24 27 -20 55
+-36 62 -36 21 0 79 -91 79 -123 0 -23 9 -31 73 -63 50 -26 83 -37 110 -35 27
+1 37 -2 37 -13 0 -22 56 -48 97 -44 27 2 39 -3 53 -20 16 -19 31 -23 112 -28
+54 -4 99 -12 108 -20 28 -24 92 -45 144 -48 42 -2 60 3 99 27 l47 29 -39 28
+c-21 16 -42 33 -46 39 -3 6 -14 11 -24 11 -10 0 -28 11 -41 25 -18 20 -21 28
+-12 37 7 7 12 24 12 38 0 15 9 35 20 45 21 19 40 73 40 113 0 15 -21 48 -56
+85 -49 56 -55 66 -50 97 3 22 0 42 -9 54 -22 29 -18 72 7 96 12 11 25 20 29
+20 4 0 21 24 37 53 17 28 108 136 204 240 95 103 196 217 225 254 76 97 163
+183 298 292 66 54 126 106 134 115 8 10 32 26 52 37 30 15 40 27 45 53 8 46
+57 66 158 66 83 0 177 15 186 30 3 6 19 64 35 130 l29 120 -22 45 c-12 25 -22
+52 -22 60 0 8 -9 24 -20 35 -11 11 -20 31 -20 45 0 20 -5 25 -25 25 -27 0 -32
+18 -15 51 9 15 22 19 69 19 49 0 61 4 81 26 16 16 21 28 14 32 -148 95 -172
+115 -189 152 -10 22 -24 45 -32 51 -7 6 -13 22 -13 35 0 13 -12 35 -26 49 -15
+15 -23 32 -20 40 3 8 8 21 11 28 3 7 -8 20 -25 30 -16 10 -30 27 -30 37 0 13
+-13 23 -42 32 -32 10 -48 23 -60 48 -9 18 -31 46 -48 61 -35 32 -38 56 -11 90
+29 38 36 97 14 121 -10 11 -18 27 -18 36 0 9 -19 29 -43 45 -37 25 -43 33 -37
+54 4 16 -3 40 -20 72 -26 47 -26 49 -12 103 14 53 14 57 -6 76 -26 26 -14 44
+51 72 44 20 45 21 37 58 -22 116 -10 188 35 212 18 10 19 13 6 38 -7 15 -17
+46 -20 68 -7 38 -13 45 -71 79 -35 20 -71 48 -80 61 -9 14 -25 24 -39 24 -14
+0 -57 13 -98 29 -40 16 -92 35 -116 42 -32 9 -41 16 -37 28 4 9 -3 22 -16 32
+l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
+26 218 -30 50 c-27 43 -31 59 -29 112 1 47 -3 68 -19 91 -11 17 -20 37 -20 45
+0 8 -22 29 -49 47 -37 24 -51 40 -56 65 -14 59 -46 149 -96 267 -46 106 -50
+120 -44 171 5 46 1 70 -25 145 -17 50 -38 128 -46 174 -8 46 -21 93 -29 104
+-8 12 -15 30 -15 41 0 11 -7 27 -16 37 -14 15 -14 20 -1 46 11 21 13 45 8 97
+-6 57 -12 72 -31 85 -13 9 -44 37 -69 63 -35 35 -60 50 -102 62 -31 9 -59 22
+-62 31 -4 8 -24 23 -47 35 -22 11 -40 24 -40 29 0 5 -26 8 -57 7 -53 -1 -58 1
+-56 20 2 14 -6 25 -22 32 -14 7 -25 18 -25 27 0 8 -5 15 -11 15 -6 0 -41 15
+-78 34 -75 38 -115 35 -109 -6 4 -31 -5 -32 -431 -68 -319 -28 -376 -30 -585
+-24 -152 4 -260 3 -316 -5 -73 -9 -136 -7 -450 19 -201 16 -556 52 -790 80
+-234 28 -451 53 -482 57 l-57 6 -14 -34 c-25 -59 -66 -88 -144 -103 -47 -9
+-86 -24 -116 -45 -48 -33 -62 -37 -164 -45 -60 -5 -63 -5 -63 17 0 13 -5 28
+-11 34 -16 16 33 39 107 53 122 21 147 28 156 44 12 21 61 46 92 46 14 0 31 9
+41 23 26 37 -4 33 -103 -17 -101 -51 -214 -85 -317 -95 -84 -9 -396 -2 -410 9
+-5 5 -36 11 -68 15 -39 5 -68 15 -87 31 -15 13 -39 24 -53 24 -43 0 -68 48
+-71 133 -1 50 -7 82 -19 100 -9 14 -17 37 -17 50 0 18 -5 23 -22 23 -18 -1
+-24 5 -26 29 -2 18 -18 43 -39 63 -20 21 -32 40 -29 49 3 8 6 21 6 29 0 11 9
+10 48 -5 170 -67 252 -120 325 -210 22 -27 30 -31 42 -21 22 18 1 50 -80 118
+-47 39 -85 62 -115 70 -25 6 -81 32 -125 57 -44 25 -89 45 -100 45 -11 0 -38
+11 -60 25 -38 23 -48 24 -185 23 -80 0 -167 -4 -195 -8z"/>
+</g>
+</svg></div>
+          <div class="relative z-10 font-mono text-xs text-primary mb-4 flex items-center gap-2 drop-shadow-md">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3ad389" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 
+            POLAND TELEMETRY
+          </div>
+          
+          <!-- EXPLICIT WROCLAW LABEL ADDED -->
+          
+          
+          <div class="absolute bottom-4 left-4 z-10 bg-[#0a0a0a]/90 backdrop-blur border border-graphite p-3 rounded font-mono text-[11px] text-muted shadow-lg">
+            <div class="flex justify-between gap-6 mb-1"><span>TIME (WAW):</span><span id="wroclaw-time" class="text-primary">--:--</span></div>
+            <div class="flex justify-between gap-6"><span>TEMP (LIVE):</span><span id="wroclaw-temp" class="text-success font-bold">--°C</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Timer Component -->
+  <section class="max-w-5xl mx-auto px-6 py-10 blur-fade">
+    <div class="flex items-center gap-6 p-6 border border-graphite rounded-2xl bg-surface transition-colors">
+      <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-accent/10 text-accent">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-mono text-xs text-muted tracking-widest uppercase mb-1">T-MINUS TO ACADEMY 2026</span>
+        <div id="countdown-timer" class="font-mono text-3xl font-bold tracking-wider text-primary">
+          --D --H --M --S
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Terminal -->
+  <section class="hidden md:block max-w-5xl mx-auto px-6 py-16 border-t border-graphite mb-20 blur-fade">
+    <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; SYS.CONSOLE</div>
+    
+    <div class="border border-graphite rounded-xl bg-void overflow-hidden shadow-2xl relative z-10">
+      <div class="bg-[#050505] border-b border-graphite px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="flex gap-2">
+            <div class="w-3 h-3 rounded-full bg-danger"></div>
+            <div class="w-3 h-3 rounded-full bg-muted"></div>
+            <div class="w-3 h-3 rounded-full bg-success"></div>
+          </div>
+          <div class="font-mono text-xs text-muted ml-2 flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg> bash
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 font-mono text-sm max-h-[350px] overflow-y-auto" id="term-scroll">
+        <div id="terminal-output" class="space-y-2 mb-2 text-muted">
+          <div>fog_os initialized. Type 'help' to begin.</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-success font-semibold">fog1ch@sys</span><span class="text-muted">:</span><span class="text-accent font-bold">~</span><span class="text-muted">$</span>
+          <input type="text" id="terminal-input" class="interactive bg-transparent border-none outline-none text-primary flex-1 tracking-wide" spellcheck="false" autocomplete="off" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ================================================================
+       STARS BACKGROUND CANVAS
+    ================================================================ */
+    const canvas = document.getElementById('stars-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, stars = [];
+    function initStars() {
+      width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
+      stars = Array.from({length: 80}, () => ({ x: Math.random() * width, y: Math.random() * height, r: Math.random() * 1.5, dx: (Math.random() - 0.5) * 0.2, dy: (Math.random() - 0.5) * 0.2, a: Math.random() }));
+    }
+    window.addEventListener('resize', initStars); initStars();
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      const now = Date.now() * 0.001;
+      stars.forEach(s => {
+        s.x += s.dx; s.y += s.dy;
+        if(s.x < 0 || s.x > width) s.dx = -s.dx; if(s.y < 0 || s.y > height) s.dy = -s.dy;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        // Optimized: Removed expensive string interpolation and sin calculation per star every frame if causing lag. 
+        // Using a simpler static opacity with a small blink factor.
+        ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.3 + Math.abs(Math.sin(now * s.a)) * 0.3) + ')'; 
+        ctx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    /* ================================================================
+       WROCLAW TEMPERATURE (Real-Time API)
+    ================================================================ */
+    function fetchTemp() {
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=51.1042&longitude=17.0322&current_weather=true')
+        .then(r => r.json())
+        .then(d => {
+          if(d.current_weather) document.getElementById('wroclaw-temp').textContent = Math.round(d.current_weather.temperature) + '°C';
+        }).catch(e => { document.getElementById('wroclaw-temp').textContent = 'ERR'; });
+    }
+    fetchTemp();
+    setInterval(fetchTemp, 60000);
+
+    /* ================================================================
+       LANYARD API (DISCORD)
+    ================================================================ */
+    const LANYARD_ID = '1058724375970451517';
+    function fetchLanyard() {
+      fetch(`https://api.lanyard.rest/v1/users/${LANYARD_ID}`)
+        .then(r => r.json())
+        .then(json => {
+          if (!json.success) return;
+          const d = json.data;
+          
+          const dotEl = document.getElementById('presence-status-dot');
+          const statEl = document.getElementById('presence-status-text');
+          const custEl = document.getElementById('presence-custom-status');
+          const actEl = document.getElementById('presence-activity');
+          
+          const sm = { online: ['dot-online','ONLINE'], idle: ['dot-idle','IDLE'], dnd: ['dot-dnd','DND'] };
+          const s = sm[d.discord_status] || ['dot-offline','OFFLINE'];
+          dotEl.className = `absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-[#0a0a0a] ${s[0]}`;
+          statEl.textContent = s[1];
+
+          if (d.activities) {
+            const cust = d.activities.find(a => a.type === 4);
+            custEl.textContent = cust ? `${cust.emoji?.name||''} ${cust.state||''}`.trim() : '';
+          }
+
+          if (d.listening_to_spotify && d.spotify) {
+            actEl.innerHTML = `<span style="color:#3ad389;">▶ SPOTIFY</span> // <span style="color:#ccc;">${d.spotify.song}</span> by ${d.spotify.artist}`;
+          } else {
+            const rel = (d.activities||[]).filter(a => a.type !== 4);
+            actEl.innerHTML = rel.length > 0 ? `<span style="color:#888;">&gt; APP</span> <span style="color:#ccc;">${rel[0].name}</span>` : "&gt; SYS.IDLE // No active tasks";
+          }
+        }).catch(()=>{});
+    }
+    fetchLanyard(); setInterval(fetchLanyard, 15000);
+
+    /* ================================================================
+       BLUR FADE
+    ================================================================ */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -50px 0px" });
+    document.querySelectorAll('.blur-fade').forEach(el => observer.observe(el));
+
+    /* ================================================================
+       I18N & TYPING (DEFAULT SET TO EN)
+    ================================================================ */
+    const i18n = {
+      en: {
+        bio_text: "Software Engineering & AI enthusiast. Building the future from Poland.",
+        tag_poland: "[ POLAND ]", tag_se: "[ SOFTWARE ENG ]", tag_ai: "[ AI / ML ]", hw_title: "Hardware Setup", timeline_title: "Roadmap",
+        time_1_date: "2026 / PRESENT", time_1_title: "Accepted to College", time_1_desc: "Started studying as a Software Engineering Technician with an AI focus in Poland.",
+        time_2_date: "2026 - 2031", time_2_title: "5 Years of Grind & Study", time_2_desc: "Deep dive into programming, math, building complex projects, and surviving the matrix.",
+        time_4_date: "FUTURE", time_4_title: "Graduate", time_4_desc: "Becoming a full-time Senior AI / Software Engineer. The real game begins.",
+        friend_1_quote: '"psychopath, manipulator, billionaire (not yet)"',
+        friend_new_quote: '"gypsy1488, don\'t judge don\'t wake nedabudi dabudai dabudi budai"',
+        peak_title: "Expedition: AI & Core", peak_item1: "AI: Neural Networks", peak_item2: "Lang: Polish"
+      },
+      ru: {
+        bio_text: "Разработчик ПО и энтузиаст ИИ. Строю будущее из Польши.",
+        tag_poland: "[ ПОЛЬША ]", tag_se: "[ РАЗРАБОТКА ПО ]", tag_ai: "[ ИИ / МО ]", hw_title: "Железо / Сетап", timeline_title: "Таймлайн / Цели",
+        time_1_date: "2026 / ТЕКУЩЕЕ", time_1_title: "Принятие в училище", time_1_desc: "Начал обучение на техника-программиста с уклоном в ИИ в Польше.",
+        time_2_date: "2026 - 2031", time_2_title: "5 лет гринда и учёбы", time_2_desc: "Глубокое погружение в код, создание проектов и выживание в матрице.",
+        time_4_date: "БУДУЩЕЕ", time_4_title: "Выпускник", time_4_desc: "Становление Senior AI инженером. Начало настоящей игры.",
+        friend_1_quote: '"psychopath, manipulator, billionaire (not yet)"',
+        friend_new_quote: '"цыган1488,не суди не буди недабуди дабудай дабуди будай"',
+        peak_title: "Экспедиция: ИИ и Фундаментал", peak_item1: "AI: Нейронные сети", peak_item2: "Язык: Польский"
+      }
+    };
+    let currentLang = 'en'; // DEFAULT IS ENGLISH
+    let typeInterval = null;
+    
+    function t(key) { return i18n[currentLang][key] || i18n.en[key]; }
+    function startTyping(text) {
+      const el = document.getElementById('typing-text'); clearInterval(typeInterval); el.textContent = ''; let i = 0;
+      typeInterval = setInterval(() => { el.textContent += text.charAt(i); i++; if (i >= text.length) clearInterval(typeInterval); }, 35);
+    }
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('lang-en').className = `interactive px-3 py-1 rounded transition-colors font-medium ${lang==='en'?'bg-primary text-void':'hover:text-primary text-muted'}`;
+      document.getElementById('lang-ru').className = `interactive px-3 py-1 rounded transition-colors font-medium ${lang==='ru'?'bg-primary text-void':'hover:text-primary text-muted'}`;
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+      startTyping(t('bio_text'));
+    }
+    setLang('en');
+
+    /* ================================================================
+       CURSOR LOGIC
+    ================================================================ */
+    const dot = document.getElementById('cursor-dot'); const ring = document.getElementById('cursor-ring');
+    let mx = window.innerWidth/2, my = window.innerHeight/2;
+    let dotX = mx, dotY = my, ringX = mx, ringY = my;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function loopCursor() { 
+      dotX += (mx - dotX) * 0.4; dotY += (my - dotY) * 0.4;
+      ringX += (mx - ringX) * 0.15; ringY += (my - ringY) * 0.15;
+      dot.style.transform = `translate(-50%, -50%) translate3d(${dotX}px, ${dotY}px, 0)`; 
+      ring.style.transform = `translate(-50%, -50%) translate3d(${ringX}px, ${ringY}px, 0)`; 
+      requestAnimationFrame(loopCursor); 
+    }
+    requestAnimationFrame(loopCursor);
+    document.querySelectorAll('.interactive, a, button, input').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.classList.add('hovered-ring'); dot.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { ring.classList.remove('hovered-ring'); dot.style.opacity = '1'; });
+    });
+
+    /* ================================================================
+       CLOCK & TIMER (WROCLAW) - WRAPPED IN TRY CATCH SO IT NEVER BREAKS
+    ================================================================ */
+    const targetDate = new Date('2026-09-01T08:00:00').getTime();
+    function tick() {
+      const now = new Date();
+      let timeStr = "";
+      
+      try {
+        timeStr = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Warsaw', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(now);
+      } catch (e) {
+        timeStr = now.toLocaleTimeString(); // Fallback
+      }
+      
+      const clockEl = document.getElementById('clock');
+      const wroclawTimeEl = document.getElementById('wroclaw-time');
+      if(clockEl) clockEl.textContent = timeStr + ' WAW';
+      if(wroclawTimeEl) wroclawTimeEl.textContent = timeStr;
+      const navTime = document.getElementById('nav-time');
+      if(navTime) navTime.textContent = timeStr;
+
+      try {
+        const dist = targetDate - now.getTime();
+        const cdEl = document.getElementById('countdown-timer');
+        if (dist < 0) cdEl.textContent = "ACADEMY STARTED";
+        else {
+          cdEl.textContent = `${Math.floor(dist/86400000)}D ${Math.floor((dist%86400000)/3600000).toString().padStart(2,'0')}H ${Math.floor((dist%3600000)/60000).toString().padStart(2,'0')}M ${Math.floor((dist%60000)/1000).toString().padStart(2,'0')}S`;
+        }
+      } catch(e) {}
+    }
+    setInterval(tick, 1000); tick();
+
+    /* ================================================================
+       ORIGINAL TERMINAL COMMANDS
+    ================================================================ */
+    const termInput = document.getElementById('terminal-input');
+    const termOutput = document.getElementById('terminal-output');
+    
+    function triggerMatrixRain() {
+      const c = document.createElement('canvas'); c.className = 'fixed inset-0 z-[9999] bg-black'; document.body.appendChild(c);
+      const ctx = c.getContext('2d'); c.width = window.innerWidth; c.height = window.innerHeight;
+      const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; const drops = Array(Math.floor(c.width/16)).fill(1);
+      const iv = setInterval(() => {
+        ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle = '#3ad389'; ctx.font = '16px monospace';
+        drops.forEach((y, i) => { ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*16, y*16); if(y*16>c.height && Math.random()>0.975) drops[i]=0; drops[i]++; });
+      }, 33);
+      setTimeout(() => { clearInterval(iv); c.remove(); }, 5000);
+    }
+    
+    function triggerScreamer() {
+       const c = document.createElement('div'); c.className = 'fixed inset-0 z-[9999] bg-red-600 flex items-center justify-center font-bold text-white text-5xl'; c.textContent = "SYSTEM FAILURE"; document.body.appendChild(c);
+       setTimeout(() => c.remove(), 500);
+    }
+
+    function triggerGlitchError() {
+       const c = document.createElement('div'); c.className = 'fixed inset-0 z-[9999] bg-black text-red-500 font-mono text-4xl p-10 flex items-center justify-center text-center'; c.textContent = currentLang === 'ru' ? 'ТЫ ЧТО, НЕ УМЕЕШЬ ПИСАТЬ?!' : "CAN'T YOU TYPE?!"; document.body.appendChild(c);
+       setTimeout(() => c.remove(), 2000);
+    }
+
+    termInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const val = termInput.value.trim(); termInput.value = '';
+        if (!val) return;
+        
+        const cmd = val.toLowerCase();
+        let res = '', ignoreAppend = false;
+        
+        if (cmd === 'help') res = 'Commands: help, clear, ping, date, matrix, z';
+        else if (cmd === 'clear') { termOutput.innerHTML = ''; return; }
+        else if (cmd === 'ping') res = 'pong! (0ms)';
+        else if (cmd === 'date') res = new Date().toString();
+        else if (cmd === 'matrix') { res = 'Wake up, Neo...'; setTimeout(triggerMatrixRain, 500); }
+        
+        else if (cmd === '2019 russia') { res = 'SYSTEM FAILURE...'; setTimeout(triggerScreamer, 500); }
+        else if (cmd === 'jw') { res = 'Redirecting to jw.org...'; setTimeout(() => window.location.href = 'https://www.jw.org/', 500); }
+        else if (cmd === 'z') { res = `<br><iframe src="https://tenor.com/embed/8256391561986732576" width="220" height="220" frameBorder="0" allowFullScreen style="pointer-events:none;border-radius:8px;"></iframe><br>`; }
+        else {
+          const bad = ['fuck', 'shit', 'bitch', 'asshole', 'blya', 'kurwa', 'бля', 'сука'];
+          if (bad.some(bw => cmd.includes(bw))) { ignoreAppend = true; triggerGlitchError(); }
+          else res = `Command not found: ${val}. Type 'help'.`;
+        }
+
+        if (!ignoreAppend) {
+          const cLine = document.createElement('div');
+          cLine.innerHTML = `<span class="text-success font-semibold">fog1ch@sys</span><span class="text-muted">:</span><span class="text-accent font-bold">~</span><span class="text-muted">$</span> <span class="text-primary tracking-wide">${val}</span>`;
+          const rLine = document.createElement('div'); rLine.innerHTML = res;
+          
+          termOutput.appendChild(cLine); termOutput.appendChild(rLine);
+          document.getElementById('term-scroll').scrollTop = document.getElementById('term-scroll').scrollHeight;
+        }
+      }
+    });
+
+    /* ================================================================
+       MUSIC PLAYER API (Dynamic cover fetching)
+    ================================================================ */
+    let scWidget = null, isPlaying = false;
+    
+    window.addEventListener('load', () => {
+      if (typeof SC !== 'undefined') {
+        scWidget = SC.Widget(document.getElementById('sc-iframe'));
+        
+        
+        scWidget.bind(SC.Widget.Events.READY, () => {
+          scWidget.setVolume(100);
+          
+  
+          // Fetch real avatar from API instead of hardcoded link
+          scWidget.getCurrentSound(sound => {
+            if(sound && sound.artwork_url) {
+              document.getElementById('music-avatar').src = sound.artwork_url.replace('large', 't500x500');
+            }
+          });
+        });
+
+        scWidget.bind(SC.Widget.Events.PLAY, () => {
+          isPlaying = true;
+          document.getElementById('play-icon').classList.add('hidden');
+          document.getElementById('pause-icon').classList.remove('hidden');
+        });
+
+        scWidget.bind(SC.Widget.Events.PAUSE, () => {
+          isPlaying = false;
+          document.getElementById('play-icon').classList.remove('hidden');
+          document.getElementById('pause-icon').classList.add('hidden');
+        });
+      }
+    });
+
+    
+    function updateVolumeVisual(val) {
+      const fill = document.getElementById('vol-fill');
+      const thumb = document.getElementById('vol-thumb');
+      if (fill) fill.style.width = val + '%';
+      if (thumb) {
+        thumb.style.left = val + '%';
+        thumb.style.transform = 'translate(-50%, -50%)';
+      }
+      if (typeof scWidget !== 'undefined' && scWidget) {
+        scWidget.setVolume(Number(val));
+      }
+    }
+  
+    function togglePlayPause() {
+      if (!scWidget) return;
+      isPlaying = !isPlaying;
+      
+      if (isPlaying) {
+        document.getElementById('play-icon').classList.add('hidden');
+        document.getElementById('pause-icon').classList.remove('hidden');
+      } else {
+        document.getElementById('play-icon').classList.remove('hidden');
+        document.getElementById('pause-icon').classList.add('hidden');
+      }
+      
+      scWidget.isPaused(paused => {
+        if (isPlaying) scWidget.play();
+        else scWidget.pause();
+      });
+    }
+
+  </script>
+</body>
+</html>
