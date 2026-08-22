@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <title>Bio Fog1ch</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -152,15 +152,20 @@
     .tilt-card h3 { transform: translateZ(30px); }
     .tilt-card p { transform: translateZ(10px); }
 
+  
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
   </style>
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
-<body class="selection:bg-accent text-primary">
+<body class="selection:bg-accent text-primary pb-24 md:pb-0">
+  <div class="fixed top-0 left-0 h-[1px] bg-accent/50 z-[9999999] transition-all duration-75" id="scroll-progress" style="width: 0%;"></div>
 
   <!-- Initialize Overlay (Bypasses Browser Autoplay Block) -->
   <div id="enter-overlay" class="fixed inset-0 z-[100000] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000 cursor-pointer">
      <h1 class="font-mono text-primary text-2xl tracking-[0.5em] animate-pulse">FOG1CH</h1>
-     <p class="text-muted text-[10px] font-mono mt-6 tracking-widest uppercase">[ CLICK ANYWHERE TO INITIALIZE SYSTEM ]</p>
+     <p class="text-muted text-[10px] font-mono mt-6 tracking-widest uppercase">[ TAP / CLICK TO INITIALIZE SYSTEM ]</p>
   </div>
 
 
@@ -209,7 +214,8 @@
         <span id="nav-time" class="text-primary font-bold">--:--</span>
       </div>
       <div class="flex gap-2 bg-surface/80 backdrop-blur-md border border-graphite p-1 rounded-md">
-        <button class="interactive px-3 py-1 rounded transition-colors text-primary bg-graphite font-medium" id="lang-en" onclick="setLang('en')">EN</button>
+        <button onclick="window.toggleMobileTerminal()" class="md:hidden text-muted hover:text-primary transition-colors font-mono text-base mr-2 flex items-center justify-center interactive" title="Terminal">&gt;_</button>
+          <button class="interactive px-3 py-1 rounded transition-colors text-primary bg-graphite font-medium" id="lang-en" onclick="setLang('en')">EN</button>
         <button class="interactive px-3 py-1 rounded transition-colors hover:text-primary font-medium" id="lang-ru" onclick="setLang('ru')">RU</button>
       </div>
     </div>
@@ -234,21 +240,21 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         <div class="flex flex-col text-left">
           <span class="font-medium text-sm">Telegram</span>
-          <span class="font-mono text-[10px] text-muted">@Fog1ch0</span>
+          <span class="font-mono text-[10px] text-muted relative z-10 hover:text-primary transition-colors cursor-pointer px-1 -mx-1 rounded bg-graphite/0 hover:bg-graphite/50" onclick="copyToClipboard(event, '@Fog1ch0')" title="Copy to clipboard">@Fog1ch0</span>
         </div>
       </a>
       <a href="https://youtube.com/@Fog1ch" target="_blank" class="metal-btn interactive magnetic p-4 flex items-center gap-3">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
         <div class="flex flex-col text-left">
           <span class="font-medium text-sm">YouTube</span>
-          <span class="font-mono text-[10px] text-muted">@Fog1ch</span>
+          <span class="font-mono text-[10px] text-muted relative z-10 hover:text-primary transition-colors cursor-pointer px-1 -mx-1 rounded bg-graphite/0 hover:bg-graphite/50" onclick="copyToClipboard(event, '@Fog1ch')" title="Copy to clipboard">@Fog1ch</span>
         </div>
       </a>
       <a href="https://github.com/Fog1ch" target="_blank" class="metal-btn interactive magnetic p-4 flex items-center gap-3">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9281f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
         <div class="flex flex-col text-left">
           <span class="font-medium text-sm">GitHub</span>
-          <span class="font-mono text-[10px] text-muted">github.com/Fog1ch</span>
+          <span class="font-mono text-[10px] text-muted relative z-10 hover:text-primary transition-colors cursor-pointer px-1 -mx-1 rounded bg-graphite/0 hover:bg-graphite/50" onclick="copyToClipboard(event, 'Fog1ch')" title="Copy to clipboard">github.com/Fog1ch</span>
         </div>
       </a>
     </div>
@@ -346,21 +352,21 @@
       <div>
         <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; USR.TIMELINE</div>
         <h2 class="text-3xl font-semibold mb-10 text-primary" data-i18n="timeline_title">Roadmap</h2>
-        <div class="border-l border-graphite pl-8 space-y-10 relative">
+        <div class="border-l border-graphite pl-6 md:pl-8 ml-4 space-y-10 relative">
           <div class="relative">
-            <div class="absolute -left-[37px] top-1 w-3 h-3 bg-success rounded-full ring-4 ring-void"></div>
+            <div class="absolute -left-[6px] top-1.5 w-3 h-3 bg-success rounded-full ring-4 ring-void"></div>
             <div class="font-mono text-xs text-muted mb-2 tracking-widest uppercase" data-i18n="time_1_date">2026 / PRESENT</div>
             <div class="text-lg font-medium text-primary mb-2" data-i18n="time_1_title">Technikum Admission</div>
             
           </div>
           <div class="relative">
-            <div class="absolute -left-[37px] top-1 w-3 h-3 bg-accent rounded-full ring-4 ring-void shadow-[0_0_10px_#9281f7]"></div>
+            <div class="absolute -left-[6px] top-1.5 w-3 h-3 bg-accent rounded-full ring-4 ring-void shadow-[0_0_10px_#9281f7]"></div>
             <div class="font-mono text-xs text-muted mb-2 tracking-widest uppercase" data-i18n="time_2_date">2026 - 2031</div>
             <div class="text-lg font-medium text-primary mb-2" data-i18n="time_2_title">The 5-Year Grind</div>
             
           </div>
           <div class="relative">
-            <div class="absolute -left-[37px] top-1 w-3 h-3 bg-graphite rounded-full ring-4 ring-void"></div>
+            <div class="absolute -left-[6px] top-1.5 w-3 h-3 bg-graphite rounded-full ring-4 ring-void"></div>
             <div class="font-mono text-xs text-muted mb-2 tracking-widest uppercase" data-i18n="time_4_date">FUTURE</div>
             <div class="text-lg font-medium text-primary mb-2" data-i18n="time_4_title">Graduation & Career</div>
             
@@ -522,15 +528,23 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
       </div>
       <div class="flex flex-col">
-        <span id="timer-title" class="font-mono text-xs text-muted tracking-widest uppercase mb-1 transition-all">T-MINUS TO ACADEMY 2026</span>
-        <div id="countdown-timer" class="font-mono text-3xl font-bold tracking-wider text-primary">
+        <span id="timer-title" data-i18n="timer_t1" class="font-mono text-xs text-muted tracking-widest uppercase mb-1 transition-all">T-MINUS TO ACADEMY 2026</span>
+        <div id="countdown-timer" class="font-mono text-xl sm:text-2xl md:text-3xl font-bold tracking-wider text-primary">
           --D --H --M --S
         </div>
+          <button onclick="openMatrixModal()" class="mt-4 px-4 py-2 border border-graphite rounded-lg bg-[#111314] hover:border-accent hover:text-accent transition-all duration-300 font-mono text-[10px] tracking-widest text-muted flex items-center gap-2 w-max">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <span data-i18n="timer_btn">OPEN GRIND MATRIX</span>
+          </button>
+
       </div>
     </div>
   </section>
 
   
+    
+  
+
     <!-- Telegram Life Section -->
     <section class="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite blur-fade">
       <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; CHANNEL.PERSONAL</div>
@@ -550,7 +564,7 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
 
 
     <!-- Terminal -->
-  <section class="hidden md:block max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite mb-20 blur-fade">
+  <section id="terminal-section" class="hidden md:block max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-graphite mb-20 blur-fade">
     <div class="font-mono text-xs text-muted mb-8 uppercase tracking-widest">&gt; SYS.CONSOLE</div>
     
     <div class="border border-graphite rounded-xl bg-void overflow-hidden shadow-2xl relative z-10">
@@ -573,7 +587,7 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
         </div>
         <div class="flex items-center gap-3">
           <span class="text-success font-semibold">fog1ch@sys</span><span class="text-muted">:</span><span class="text-accent font-bold">~</span><span class="text-muted">$</span>
-          <input type="text" id="terminal-input" class="interactive bg-transparent border-none outline-none text-primary flex-1 tracking-wide" spellcheck="false" autocomplete="off" />
+          <input type="text" id="terminal-input" class="interactive bg-transparent border-none outline-none text-primary flex-1 tracking-wide text-[16px] md:text-sm" spellcheck="false" autocomplete="off" />
         </div>
       </div>
     </div>
@@ -681,8 +695,23 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
         tg_life_subtitle: "My Personal Channel",
         tg_life_desc: "Join my exclusive Telegram channel to follow my daily grind, insights, and behind-the-scenes life.",
         tg_life_btn: "JOIN CHANNEL",
-        peak_title: "Expedition: AI & Core", peak_item1: "AI: Neural Networks", peak_item2: "Lang: Polish"
-      },
+        peak_title: "Expedition: AI & Core", peak_item1: "AI: Neural Networks", peak_item2: "Lang: Polish",
+          timer_t1: "T-MINUS TO ACADEMY 2026",
+          timer_t2: "T-MINUS TO GRADUATION (5 YEARS GRIND)",
+          timer_btn: "OPEN GRIND MATRIX",
+          mat_title: "LIVE PROGRESS TRACKER",
+          mat_y: "Y",
+          mat_leg1: "PRE-BOOT (AUG)",
+          mat_leg2: "YEAR 1 GOAL",
+          mat_leg3: "Y2-Y5 (GRADUATION)",
+          mat_tt1: "PRE-BOOT",
+          mat_tt2: "YEAR 1 GOAL",
+          mat_tt3: "DEEP GRIND",
+          mat_comp: "COMPLETED",
+          mat_prog: "IN PROGRESS",
+          mat_pend: "PENDING",
+          timer_d: "D", timer_h: "H", timer_m: "M", timer_s: "S", timer_mo: "MO", timer_w: "W"
+        },
       ru: {
         bio_text: "Разработчик ПО и энтузиаст ИИ. Строю будущее из Польши.",
         tag_poland: "[ ПОЛЬША ]", tag_se: "[ РАЗРАБОТКА ПО ]", tag_ai: "[ ИИ / ML ]", 
@@ -696,8 +725,23 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
         tg_life_subtitle: "Мой Личный Канал",
         tg_life_desc: "Присоединяйся к моему эксклюзивному Telegram-каналу, чтобы следить за повседневным гриндом, мыслями и жизнью за кадром.",
         tg_life_btn: "ПРИСОЕДИНИТЬСЯ",
-        peak_title: "Фокус: ИИ & Разработка", peak_item1: "AI: Нейросети", peak_item2: "Язык: Польский"
-      }
+        peak_title: "Фокус: ИИ & Разработка", peak_item1: "AI: Нейросети", peak_item2: "Язык: Польский",
+          timer_t1: "ОТСЧЕТ ДО АКАДЕМИИ 2026",
+          timer_t2: "ОТСЧЕТ ДО ВЫПУСКА (5 ЛЕТ ГРИНДА)",
+          timer_btn: "ОТКРЫТЬ МАТРИЦУ",
+          mat_title: "ЖИВОЙ ТРЕКЕР ПРОГРЕССА",
+          mat_y: "Г",
+          mat_leg1: "ПРЕД-ЗАПУСК (АВГ)",
+          mat_leg2: "ЦЕЛЬ: 1 КУРС",
+          mat_leg3: "Г2-Г5 (ВЫПУСК)",
+          mat_tt1: "ПРЕД-ЗАПУСК",
+          mat_tt2: "ЦЕЛЬ: 1 КУРС",
+          mat_tt3: "DEEP GRIND",
+          mat_comp: "ЗАВЕРШЕНО",
+          mat_prog: "В ПРОЦЕССЕ",
+          mat_pend: "ОЖИДАНИЕ",
+          timer_d: "Д", timer_h: "Ч", timer_m: "М", timer_s: "С", timer_mo: "МЕС", timer_w: "Н"
+        }
     };
     let currentLang = 'en'; // DEFAULT IS ENGLISH
     let typeInterval = null;
@@ -711,7 +755,8 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
       currentLang = lang;
       document.getElementById('lang-en').className = `interactive px-3 py-1 rounded transition-colors font-medium ${lang==='en'?'bg-primary text-void':'hover:text-primary text-muted'}`;
       document.getElementById('lang-ru').className = `interactive px-3 py-1 rounded transition-colors font-medium ${lang==='ru'?'bg-primary text-void':'hover:text-primary text-muted'}`;
-      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+      if (window.updateMatrix) window.updateMatrix();
+        document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
       startTyping(t('bio_text'));
     }
     setLang('en');
@@ -765,15 +810,21 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
           const nowMs = now.getTime();
           
           if (nowMs < target1) {
-            if (titleEl) titleEl.textContent = 'T-MINUS TO ACADEMY 2026';
+            if (titleEl) titleEl.textContent = typeof t === 'function' && t('timer_t1') ? t('timer_t1') : 'T-MINUS TO ACADEMY 2026';
             const dist = target1 - nowMs;
             const d = Math.floor(dist/86400000);
             const h = Math.floor((dist%86400000)/3600000).toString().padStart(2,'0');
             const m = Math.floor((dist%3600000)/60000).toString().padStart(2,'0');
             const s = Math.floor((dist%60000)/1000).toString().padStart(2,'0');
-            if (cdEl) cdEl.textContent = d + 'D ' + h + 'H ' + m + 'M ' + s + 'S';
+            
+            const td = typeof t === 'function' && t('timer_d') ? t('timer_d') : 'D';
+            const th = typeof t === 'function' && t('timer_h') ? t('timer_h') : 'H';
+            const tm = typeof t === 'function' && t('timer_m') ? t('timer_m') : 'M';
+            const ts = typeof t === 'function' && t('timer_s') ? t('timer_s') : 'S';
+            
+            if (cdEl) cdEl.textContent = d + td + ' ' + h + th + ' ' + m + tm + ' ' + s + ts;
           } else if (nowMs < target2) {
-            if (titleEl) titleEl.textContent = 'T-MINUS TO GRADUATION (5 YEARS GRIND)';
+            if (titleEl) titleEl.textContent = typeof t === 'function' && t('timer_t2') ? t('timer_t2') : 'T-MINUS TO GRADUATION (5 YEARS GRIND)';
             const dist = target2 - nowMs;
             const totalDays = Math.floor(dist / 86400000);
             const months = Math.floor(totalDays / 30.436875);
@@ -783,10 +834,18 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
             const h = Math.floor((dist%86400000)/3600000).toString().padStart(2,'0');
             const m = Math.floor((dist%3600000)/60000).toString().padStart(2,'0');
             const s = Math.floor((dist%60000)/1000).toString().padStart(2,'0');
-            if (cdEl) cdEl.textContent = months + 'M ' + weeks + 'W ' + days + 'D ' + h + 'H ' + m + 'M ' + s + 'S';
+            
+            const tmo = typeof t === 'function' && t('timer_mo') ? t('timer_mo') : 'MO';
+            const tw = typeof t === 'function' && t('timer_w') ? t('timer_w') : 'W';
+            const td = typeof t === 'function' && t('timer_d') ? t('timer_d') : 'D';
+            const th = typeof t === 'function' && t('timer_h') ? t('timer_h') : 'H';
+            const tm = typeof t === 'function' && t('timer_m') ? t('timer_m') : 'M';
+            const ts = typeof t === 'function' && t('timer_s') ? t('timer_s') : 'S';
+            
+            if (cdEl) cdEl.textContent = months + tmo + ' ' + weeks + tw + ' ' + days + td + ' ' + h + th + ' ' + m + tm + ' ' + s + ts;
           } else {
-            if (titleEl) titleEl.textContent = 'MISSION COMPLETE';
-            if (cdEl) cdEl.textContent = 'GRADUATED';
+            if (titleEl) titleEl.textContent = typeof t === 'function' && t('timer_complete') ? t('timer_complete') : 'MISSION COMPLETE';
+            if (cdEl) cdEl.textContent = typeof t === 'function' && t('timer_grad') ? t('timer_grad') : 'GRADUATED';
           }
         } catch(e) {}
     }
@@ -869,9 +928,167 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
   
   window.addEventListener('load', () => {
 
-
+  // Dynamic Live Grind Matrix
+  function updateMatrix() {
+    const container = document.getElementById('matrix-terminal-grid');
+    if (!container) return;
     
-    if (window.matchMedia('(pointer: fine)').matches) {
+    // Matrix starts August 17, 2026 (2 weeks before Sept 1)
+    const startDate = new Date('2026-08-17T00:00:00').getTime();
+    const now = new Date().getTime();
+    
+    
+    const totalYears = 5;
+    const totalWeeks = 260;
+    const elapsedMs = now - startDate;
+    const totalMs = totalWeeks * (7 * 24 * 60 * 60 * 1000);
+    let passedWeeks = Math.floor(elapsedMs / (7 * 24 * 60 * 60 * 1000));
+    if (passedWeeks < 0) passedWeeks = 0;
+    if (passedWeeks > totalWeeks) passedWeeks = totalWeeks;
+    let overallPercent = (elapsedMs / totalMs) * 100;
+    if (overallPercent < 0) overallPercent = 0;
+    if (overallPercent > 100) overallPercent = 100;
+    
+    const statusEl = document.getElementById('matrix-overall-status');
+    const barEl = document.getElementById('matrix-overall-bar');
+    if(statusEl) statusEl.textContent = 'WEEKS PASSED: ' + passedWeeks + ' / 260 [' + overallPercent.toFixed(2) + '%]';
+    if(barEl) barEl.style.width = overallPercent + '%';
+    
+    const weeksPerYear = 52;
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    
+    let html = '';
+    for (let year = 1; year <= totalYears; year++) {
+      html += '<div class="flex gap-[6px] items-center">';
+      html += '<div class="w-8 text-[9px] text-muted font-mono mr-2 opacity-50 tracking-widest">' + (typeof t === "function" ? t("mat_y") : "Y") + year + '</div>';
+      html += '<div class="flex gap-[6px] flex-1">';
+      
+      for (let week = 1; week <= weeksPerYear; week++) {
+         const overallWeekIndex = ((year - 1) * weeksPerYear) + (week - 1);
+         const cellStartTime = startDate + (overallWeekIndex * msPerWeek);
+         const cellEndTime = cellStartTime + msPerWeek;
+         
+         let style = '';
+         let classes = 'w-[10px] h-[10px] rounded-[2px] border interactive ';
+         let tooltip = '';
+         
+         let phaseColor = '#3ad389';
+         let phaseRGB = '58,211,137';
+         
+         let matY = (typeof t === 'function' ? t('mat_y') : 'Y') || 'Y';
+         
+         if (year === 1 && week <= 2) {
+            phaseColor = '#f85149';
+            phaseRGB = '248,81,73';
+            tooltip = (typeof t === 'function' ? t('mat_tt1') : 'PRE-BOOT') + ' (' + matY + '1W' + week + ')';
+         } else if (year === 1) {
+            phaseColor = '#9281f7';
+            phaseRGB = '146,129,247';
+            tooltip = (typeof t === 'function' ? t('mat_tt2') : 'YEAR 1 GOAL') + ' (' + matY + '1W' + week + ')';
+         } else {
+            tooltip = (typeof t === 'function' ? t('mat_tt3') : 'DEEP GRIND') + ' (' + matY + year + 'W' + week + ')';
+         }
+         
+         if (now >= cellEndTime) {
+            classes += 'opacity-90 hover:opacity-100 transition-opacity';
+            style = 'background-color: ' + phaseColor + '; border-color: ' + phaseColor + '; box-shadow: 0 0 5px rgba(' + phaseRGB + ', 0.5);';
+            tooltip += ' - ' + (typeof t === 'function' ? t('mat_comp') : 'COMPLETED');
+         } else if (now >= cellStartTime && now < cellEndTime) {
+            const percent = ((now - cellStartTime) / msPerWeek) * 100;
+            style = 'border-color: ' + phaseColor + '; background: linear-gradient(to right, rgba(' + phaseRGB + ',0.8) ' + percent + '%, transparent ' + percent + '%); box-shadow: 0 0 8px rgba(' + phaseRGB + ', 0.8);';
+            tooltip += ' - ' + percent.toFixed(1) + '% ' + (typeof t === 'function' ? t('mat_prog') : 'IN PROGRESS');
+         } else {
+            classes += 'opacity-20 hover:opacity-70 transition-opacity';
+            style = 'border-color: ' + phaseColor + ';';
+            tooltip += ' - ' + (typeof t === 'function' ? t('mat_pend') : 'PENDING');
+         }
+         
+         
+    const cellDate = new Date(cellStartTime);
+    const dateStr = cellDate.toLocaleDateString(typeof currentLang !== 'undefined' && currentLang === 'ru' ? 'ru-RU' : 'en-GB', { month: 'short', year: 'numeric' });
+    const toastMsg = (typeof currentLang !== 'undefined' && currentLang === 'ru' ? 'Неделя ' : 'Week ') + (overallWeekIndex + 1) + ' -> ' + dateStr;
+    html += '<div onclick="showToast(\'' + toastMsg + '\')" class="' + classes + '" style="' + style + '" title="' + tooltip + '"></div>';
+    
+      }
+      
+      html += '</div></div>';
+    }
+    container.innerHTML = html;
+  }
+
+  window.openMatrixModal = function() {
+    updateMatrix();
+    const modal = document.getElementById('matrix-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    
+    // Auto-update current cell every minute while open
+    window.matrixInterval = setInterval(updateMatrix, 60000);
+  }
+
+  
+  document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('matrix-modal');
+    if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+      window.closeMatrixModal();
+    }
+  });
+  
+  
+  window.showToast = function(msg) {
+    const toast = document.getElementById('sys-toast');
+    const toastMsg = document.getElementById('sys-toast-msg');
+    if(!toast || !toastMsg) return;
+    
+    toastMsg.textContent = msg.replace(/\[|\]/g, '').trim();
+    
+    toast.classList.remove('opacity-0', '-translate-y-4');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    
+    if(window.toastTimer) clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => {
+      toast.classList.remove('opacity-100', 'translate-y-0');
+      toast.classList.add('opacity-0', '-translate-y-4');
+    }, 2000);
+  };
+  
+  
+  
+  window.copyToClipboard = function(e, text) {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(text).then(() => {
+      const msg = (typeof currentLang !== 'undefined' && currentLang === 'ru') ? 'Скопировано в буфер' : 'Copied to clipboard';
+      if(window.showToast) window.showToast(msg);
+    });
+  };
+  
+  window.toggleMobileTerminal = function() {
+    const ts = document.getElementById('terminal-section');
+    if (ts) {
+      ts.classList.toggle('hidden');
+      if (!ts.classList.contains('hidden')) {
+        setTimeout(() => {
+          ts.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          document.getElementById('terminal-input').focus();
+        }, 100);
+      }
+    }
+  };
+  
+  window.closeMatrixModal = function() {
+    const modal = document.getElementById('matrix-modal');
+    modal.classList.add('opacity-0');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }, 300);
+    if (window.matrixInterval) clearInterval(window.matrixInterval);
+  }
+
+
+  if (window.matchMedia('(pointer: fine)').matches) {
       document.querySelectorAll('.tilt-card').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
@@ -985,4 +1202,59 @@ l-23 17 48 108 c43 96 56 116 115 172 113 107 179 139 391 192 l185 46 27 218
     }
 
   </script>
+
+    <!-- Matrix Terminal Modal -->
+    <div id="matrix-modal" onclick="if(event.target === this) window.closeMatrixModal()" class="fixed inset-0 cursor-pointer z-[999999] bg-[#000000dd] backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300 p-4">
+      
+      <div class="w-full max-w-5xl bg-[#0a0a0a] cursor-default border border-graphite rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- Terminal Header -->
+        <div class="h-10 bg-[#111314] border-b border-graphite flex items-center justify-between px-4 shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-[#f85149]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#f08d49]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#3ad389]"></div>
+          </div>
+          <div class="font-mono text-[9px] md:text-[10px] text-muted tracking-widest uppercase truncate max-w-[140px] sm:max-w-none">sys.telemetry // grind_matrix.exe</div>
+          <div class="font-mono text-[10px] text-accent tracking-widest uppercase ml-auto mr-4 hidden sm:block" id="matrix-overall-status">WEEKS PASSED: 0 / 260 [0.00%]</div>
+          <button onclick="closeMatrixModal()" class="text-muted hover:text-error transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="w-full h-[1px] bg-graphite"><div id="matrix-overall-bar" class="h-full bg-accent transition-all duration-1000" style="width: 0%"></div></div>
+
+        <!-- Terminal Content -->
+        <div class="p-6 md:p-8 overflow-y-auto relative flex-1 hide-scrollbar">
+          <div class="font-mono text-xs text-accent mb-6 tracking-widest uppercase flex items-center gap-2">
+            <div class="w-2 h-2 bg-accent animate-pulse"></div>
+            <span data-i18n="mat_title">LIVE PROGRESS TRACKER</span>
+          </div>
+          
+          <div class="overflow-x-auto hide-scrollbar w-full relative">
+            <div class="flex flex-col gap-[6px] min-w-[700px] pb-4" id="matrix-terminal-grid">
+              <!-- JS will populate -->
+            </div>
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-graphite/50 font-mono text-[10px] text-muted flex flex-wrap gap-6">
+            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-[#f85149] shadow-[0_0_5px_#f85149]"></div> <span data-i18n="mat_leg1">PRE-BOOT (AUG)</span></div>
+            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-[#9281f7] shadow-[0_0_5px_#9281f7]"></div> <span data-i18n="mat_leg2">YEAR 1 GOAL</span></div>
+            <div class="flex items-center gap-2"><div class="w-2 h-2 border border-[#3ad389]"></div> <span data-i18n="mat_leg3">Y2-Y5 (GRADUATION)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+      </div>
+    </div>
+
+
+
+  <!-- System Toast -->
+  <div id="sys-toast" class="fixed top-8 left-1/2 -translate-x-1/2 z-[9999999] flex items-center gap-3 bg-void/80 backdrop-blur-lg border border-graphite text-primary font-sans text-xs sm:text-sm font-medium px-5 py-3 rounded-full opacity-0 -translate-y-4 transition-all duration-400 pointer-events-none shadow-[0_10_30px_rgba(0,0,0,0.8)] whitespace-nowrap">
+    <svg class="text-accent w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="sys-toast-msg" class="tracking-wide"></span>
+  </div>
+  
 </body>
